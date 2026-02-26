@@ -1,0 +1,12 @@
+# Docker
+.docker/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+.env
+*.log
+
+
