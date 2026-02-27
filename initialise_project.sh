@@ -27,7 +27,12 @@ generate_if_missing() {
   local VALUE=$(grep "^${KEY}=" .env | cut -d= -f2)
   if [ -z "$VALUE" ]; then
     local GENERATED=$(openssl rand -hex 32)
-    sed -i '' "s/^${KEY}=.*/${KEY}=${GENERATED}/" .env
+    # macOS requires '' argument, Linux does not
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      sed -i '' "s/^${KEY}=.*/${KEY}=${GENERATED}/" .env
+    else
+      sed -i "s/^${KEY}=.*/${KEY}=${GENERATED}/" .env
+    fi
     ok "${KEY} generated and saved to .env"
   else
     ok "${KEY} already set"
@@ -59,7 +64,15 @@ echo ""
 echo "#####################################"
 echo "Starting containers"
 echo "#####################################"
-docker-compose up -d --build
+if command -v docker-compose &>/dev/null; then
+  DOCKER_COMPOSE="docker-compose"
+elif docker compose version &>/dev/null; then
+  DOCKER_COMPOSE="docker compose"
+else
+  fail "Docker Compose not found. Install it from https://docs.docker.com/compose/"
+  exit 1
+fi
+$DOCKER_COMPOSE up -d --build
 ok "Containers started"
 
 # 5. Wait for n8n
@@ -94,7 +107,7 @@ for file in ./n8n_workflows/*.json; do
       n8n import:workflow --input="/workflows/$filename" 2>/dev/null
     if [ $? -eq 0 ]; then
       ok "Imported $filename"
-      ((count++))
+      ((count+1))
     else
       warn "$filename failed or already exists"
     fi

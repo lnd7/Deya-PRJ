@@ -16,8 +16,20 @@ An AI-Agentic automation System built with n8n, Postgres (pgvector). All running
 
 ## Prerequisites
 
-- [Docker](https://www.docker.com/products/docker-desktop)
-- [Docker Compose](https://docs.docker.com/compose/)
+**macOS / Windows**
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) — includes everything (Docker + Docker Compose)
+
+**Linux (ubuntu)**
+- [Docker Engine](https://docs.docker.com/engine/install/)
+- [Docker Compose plugin](https://docs.docker.com/compose/install/linux/)
+```bash
+sudo apt-get update
+sudo apt-get install docker-compose-plugin
+```
+- Add your user to the Docker group:
+```bash
+sudo usermod -aG docker $USER && newgrp docker
+```
 
 ---
 
@@ -50,7 +62,7 @@ N8N_ENCRYPTION_KEY=
 N8N_API_KEY=
 ```
 
-> `N8N_ENCRYPTION_KEY` and `N8N_API_KEY` are automatically generated and written back to `.env` on first run. Do not change them after the project is running, by doing so will corrupt stored credentials.
+> `N8N_ENCRYPTION_KEY` and `N8N_API_KEY` are automatically generated and written back to `.env` on first run. Do not change them after the project is running; doing so will corrupt stored credentials.
 
 ### Run
 
