@@ -569,6 +569,246 @@
       ],
       "id": "298d3484-db98-4784-9888-aa8282f726f8",
       "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ff65aa27-3148-4eeb-82b5-3696b52906cc",
+              "leftValue": "={{ $('Check Input').item.json.has_file }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2096,
+        -208
+      ],
+      "id": "d2675240-45b0-4618-9209-b7c40cc65fe8",
+      "name": "files_in_message?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a summarization agent.\nYour job is to summarize the document content provided to you.\n\n## Input Fields\nYou will receive:\n- filename: {{ $json.filename }}\n- content (the text to summarize): {{ $json.content }}\n- mode: tells you what part of the document this is ({{ $json.mode }})\n- chunk_index: which part this is ({{ $json.chunk_index }})\n- total_chunks: how many parts total ({{ $json.total_chunks }})\n\n## Rules Based on Mode\n\nIf {{ $json.mode }} = \"direct\":\n- You have the COMPLETE document\n- Provide a full final summary\n- Short doc  \u2192 one paragraph\n- Medium doc \u2192 3-5 bullet points\n- Long doc   \u2192 overview + key points + conclusion\n\nIf {{ $json.mode }} = \"partial\":\n- You have chunk {{ $json.chunk_index }} of {{ $json.total_chunks }}\n- Summarize ONLY what is in this chunk\n- Do NOT conclude \u2014 more parts follow\n- End with: \"[Part {{ $json.chunk_index }} of {{ $json.total_chunks }} summarized]\"\n\nIf {{ $json.mode }} = \"final\":\n- You have the LAST chunk of {{ $json.total_chunks }} parts\n- Summarize this chunk\n- Then write a final conclusion for the whole document\n- End with: \"[End of document]\"\n\n## Rules\n- Never fabricate content not present in the document\n- Never refer to \"chunk\" or \"part\" in your summary output \u2014 write naturally\n- Always start your response with the filename: \"## {{ $json.filename }}\"\n- If content appears incomplete or cut off, note it briefly ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2544,
+        -496
+      ],
+      "id": "48dc58aa-888b-44dd-8a73-0b30f06430b9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "amount": 13
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3024,
+        -576
+      ],
+      "id": "053c2718-f36d-48fc-ac3e-6f50190f7871",
+      "name": "Wait1",
+      "webhookId": "fc7ed66d-79fc-47aa-b049-1394c7313348"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        -304
+      ],
+      "id": "3a222dc3-4b16-4384-880b-8193e3a9bd5a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2",
+          "name": "Google Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be56ba83-444f-42ef-bdd0-9bd0a02191e2",
+              "name": "output.text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2832,
+        -736
+      ],
+      "id": "7fb6cca3-6e71-445d-8f9b-4762d8706898",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.1,
+      "position": [
+        3632,
+        -752
+      ],
+      "id": "a5d8fd6b-70cb-45d2-ab76-a856c350430f",
+      "name": "Chat2",
+      "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
+    },
+    {
+      "parameters": {
+        "jsCode": "const summaries = items.map((item, index) => {\n  const text = item.json.output?.text || item.json.text || item.json.output;\n  return `${text}`;\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: summaries } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        -752
+      ],
+      "id": "195291e8-1a3c-42c4-8ab6-d96ccaba09a6",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "message": "Please attach the files you want to summarise.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.1,
+      "position": [
+        2480,
+        -48
+      ],
+      "id": "f5488e59-229b-452a-9228-174ef822c4c1",
+      "name": "Chat1",
+      "webhookId": "0814425b-b2bd-43da-8736-dc1bcbf6fca6"
+    },
+    {
+      "parameters": {
+        "jsCode": "const helperItems = $('helper').all();\n\nconst TOKEN_LIMIT = 7000;\nconst CHARS_PER_TOKEN = 4;\nconst MAX_CHARS = Math.floor(TOKEN_LIMIT * CHARS_PER_TOKEN * 0.9);\n\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const text = typeof item.json.fileContent === 'string'\n    ? item.json.fileContent\n    : JSON.stringify(item.json.fileContent || '');\n  const fileName = item.json.fileName || 'Unknown Document';\n  const estimatedTokens = Math.ceil(text.length / CHARS_PER_TOKEN);\n\n  if (!text.trim()) return;\n\n  // Small files unchanged\n  if (estimatedTokens <= TOKEN_LIMIT) {\n    results.push({\n      json: {\n        filename: fileName,\n        content: text,\n        estimated_tokens: estimatedTokens,\n        is_split: false,\n        chunk_index: 1,\n        total_chunks: 1,\n        mode: 'direct'\n      }\n    });\n    return;\n  }\n\n  // Split large files\n  const chunks = [];\n  let start = 0;\n\n  while (start < text.length) {\n    let end = start + MAX_CHARS;\n\n    if (end < text.length) {\n      const nearestSpace = text.lastIndexOf(' ', end);\n      if (nearestSpace > start) end = nearestSpace;\n    }\n\n    const chunkText = text.slice(start, end).trim();\n    if (chunkText.length > 0) chunks.push(chunkText);\n    start = end + 1;\n  }\n\n  const totalChunks = chunks.length;\n\n  chunks.forEach((chunkText, index) => {\n    const chunkIndex = index + 1;\n    results.push({\n      json: {\n        filename: fileName,\n        content: chunkText,\n        estimated_tokens: Math.ceil(chunkText.length / CHARS_PER_TOKEN),\n        is_split: true,\n        chunk_index: chunkIndex,\n        total_chunks: totalChunks,\n        mode: chunkIndex === totalChunks ? 'final' : 'partial'\n      }\n    });\n  });\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        -464
+      ],
+      "id": "bb112df7-1e82-4ed1-b536-3063f2cc4bb0",
+      "name": "summariser helper"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c00b5b8d-299f-48b6-90d7-4d3eb54c000d",
+              "leftValue": "={{ $('summariser loop').item.json.estimated_tokens }}",
+              "rightValue": 3500,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2816,
+        -512
+      ],
+      "id": "084e8996-197b-4ea8-b244-9ea96c12250a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2512,
+        -720
+      ],
+      "id": "b1fddd50-71de-4fcf-842d-7e1920e713b0",
+      "name": "summariser loop"
+    },
+    {
+      "parameters": {
+        "amount": 6
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3024,
+        -432
+      ],
+      "id": "ae93dcd6-24a8-4d19-88b6-363d3c23ce9c",
+      "name": "Wait",
+      "webhookId": "3d2010ab-632a-4644-b086-3962032673a8"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2704,
+        -272
+      ],
+      "id": "9786e36e-2f7a-425e-939b-3c2fab524ca5",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres (RAG DB)"
+        }
+      }
     }
   ],
   "connections": {
@@ -872,7 +1112,13 @@
     },
     "Switch Task": {
       "main": [
-        []
+        [
+          {
+            "node": "files_in_message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Merge": {
@@ -885,6 +1131,148 @@
           }
         ]
       ]
+    },
+    "files_in_message?": {
+      "main": [
+        [
+          {
+            "node": "summariser helper",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Chat1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "summariser loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "Chat2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summariser helper": {
+      "main": [
+        [
+          {
+            "node": "summariser loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summariser loop": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "summariser loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -893,11 +1281,13 @@
     "availableInMCP": false
   },
   "staticData": null,
-  "meta": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
   "pinData": {},
-  "versionId": "8884b6e4-b357-47c0-8ece-91f380ea067c",
+  "versionId": "3b8d9e64-b290-440b-8355-8e0b19215461",
   "activeVersionId": null,
-  "versionCounter": 310,
+  "versionCounter": 428,
   "triggerCount": 0,
   "id": "7tPyu-w8qpUo3oeb-eGdx"
 }
