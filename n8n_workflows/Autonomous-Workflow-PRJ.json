@@ -11,8 +11,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1360,
-        576
+        -1488,
+        1136
       ],
       "id": "a533467b-d007-4bff-b8db-2d8ed6b6846c",
       "name": "Document_Tool"
@@ -29,8 +29,8 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        -384,
-        -416
+        -1552,
+        -448
       ],
       "id": "303b562c-825a-451e-8b59-3cf031019d3d",
       "name": "When chat message received",
@@ -45,8 +45,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -720,
-        -16
+        -848,
+        544
       ],
       "id": "1489e677-f73f-474c-bcd1-ce92cb2f27ba",
       "name": "PDF_Extractor"
@@ -79,8 +79,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        352,
-        -416
+        -816,
+        -448
       ],
       "id": "4c51a1ff-4b86-439e-bc1e-60a701ab075b",
       "name": "files_attached?"
@@ -105,8 +105,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -64,
-        -416
+        -1232,
+        -448
       ],
       "id": "d94d413d-8fe9-4c43-b4ba-eb5c8750e308",
       "name": "Check Input"
@@ -114,7 +114,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=User message: {{ $('When chat message received').item.json.chatInput }}\n\nAnylayse the user message and decide what task from the following is required.\n- Summarisation \n- Clasification\n- Data Extraction\n- RAG Task\n",
+        "text": "=User message: {{ $('When chat message received').first().json.chatInput }}\n\nAnylayse the user message and decide what task from the following is required.\n- Summarisation \n- Clasification\n- Data Extraction\n- RAG Task\n",
         "hasOutputParser": true,
         "options": {}
       },
@@ -262,8 +262,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -720,
-        192
+        -848,
+        752
       ],
       "id": "1750990b-df30-4d66-bc77-c9e151209b5d",
       "name": "Text_Extractor"
@@ -275,8 +275,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -480,
-        448
+        -608,
+        1008
       ],
       "id": "1555c6cc-da92-497a-ae9c-661af0c952f3",
       "name": "CSV_Extractor"
@@ -289,8 +289,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -480,
-        736
+        -608,
+        1296
       ],
       "id": "6916645b-32df-472e-8615-067927257bf9",
       "name": "XLS_Extractor"
@@ -303,8 +303,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -512,
-        1008
+        -640,
+        1568
       ],
       "id": "87d7dd35-9326-4f6b-b906-45ea6aa236ca",
       "name": "XLSX_Extractor"
@@ -434,8 +434,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -1184,
-        528
+        -1312,
+        1088
       ],
       "id": "f50674c8-8475-4719-bbb2-cc93ba68c6dd",
       "name": "File Type"
@@ -447,34 +447,34 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -272,
-        -16
+        -400,
+        544
       ],
       "id": "5d757be5-90bf-4830-9437-102c9aa70999",
       "name": "pdf helper"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nconst fileName = $('CSV files loop').item.json.fileName || 'Unknown';\n\nreturn [{\n  json: {\n    fileName: fileName,\n    row_count: items.length,\n    fileContent: items.map(item => {\n      const row = {};\n      Object.entries(item.json)\n        .filter(([key]) => key !== 'myNewField')\n        .forEach(([key, value]) => row[key] = value);\n      return row;\n    })\n  }\n}];"
+        "jsCode": "const items = $input.all();\n\nconst fileName = $('CSV files loop').first().json.fileName || 'Unknown';\n\nreturn [{\n  json: {\n    fileName: fileName,\n    row_count: items.length,\n    fileContent: items.map(item => {\n      const row = {};\n      Object.entries(item.json)\n        .filter(([key]) => key !== 'myNewField')\n        .forEach(([key, value]) => row[key] = value);\n      return row;\n    })\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -272,
-        448
+        -400,
+        1008
       ],
       "id": "b57c3a9a-6901-421e-976c-4ae4271b5f9d",
       "name": "CSV helper"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nconst fileName = $('XLS files loop').item.json.fileName || 'Unknown';\n\nreturn [{\n  json: {\n    fileName: fileName,\n    row_count: items.length,\n    fileContent: items.map(item => {\n      const row = {};\n      Object.entries(item.json)\n        .filter(([key]) => key !== 'myNewField')\n        .forEach(([key, value]) => row[key] = value);\n      return row;\n    })\n  }\n}];"
+        "jsCode": "const items = $input.all();\n\nconst fileName = $('XLS files loop').first().json.fileName || 'Unknown';\n\nreturn [{\n  json: {\n    fileName: fileName,\n    row_count: items.length,\n    fileContent: items.map(item => {\n      const row = {};\n      Object.entries(item.json)\n        .filter(([key]) => key !== 'myNewField')\n        .forEach(([key, value]) => row[key] = value);\n      return row;\n    })\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -272,
-        736
+        -400,
+        1296
       ],
       "id": "2121c45a-8dee-4a27-bce8-8fefe0ecd286",
       "name": "XLS helper"
@@ -486,21 +486,21 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -272,
-        192
+        -400,
+        752
       ],
       "id": "d17c7804-bd29-4c71-9b10-514f76d57ef4",
       "name": "Text helper"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nconst fileName = $('XLSX files loop').item.json.fileName || 'Unknown';\n\nreturn [{\n  json: {\n    fileName: fileName,\n    row_count: items.length,\n    fileContent: items.map(item => {\n      const row = {};\n      Object.entries(item.json)\n        .filter(([key]) => key !== 'myNewField')\n        .forEach(([key, value]) => row[key] = value);\n      return row;\n    })\n  }\n}];"
+        "jsCode": "const items = $input.all();\n\nconst fileName = $('XLSX files loop').first().json.fileName || 'Unknown';\n\nreturn [{\n  json: {\n    fileName: fileName,\n    row_count: items.length,\n    fileContent: items.map(item => {\n      const row = {};\n      Object.entries(item.json)\n        .filter(([key]) => key !== 'myNewField')\n        .forEach(([key, value]) => row[key] = value);\n      return row;\n    })\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -272,
-        1008
+        -400,
+        1568
       ],
       "id": "5fdba658-d6fa-4de6-b2e5-5088a465c8a3",
       "name": "XLSX helper"
@@ -512,8 +512,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -720,
-        992
+        -848,
+        1552
       ],
       "id": "9f3d29f1-fa48-4c59-8fdb-5fa5e69d6e04",
       "name": "XLSX files loop"
@@ -525,8 +525,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -720,
-        720
+        -848,
+        1280
       ],
       "id": "99337519-586b-41e4-8ad0-bfc6f8ff75a3",
       "name": "XLS files loop"
@@ -538,8 +538,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -720,
-        432
+        -848,
+        992
       ],
       "id": "6ce11f86-2185-45c1-a834-bdd667ab870b",
       "name": "CSV files loop"
@@ -551,8 +551,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        320,
-        480
+        192,
+        1040
       ],
       "id": "9ab72426-d779-43bd-8984-2812774fafc3",
       "name": "helper"
@@ -564,8 +564,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        128,
-        432
+        0,
+        992
       ],
       "id": "298d3484-db98-4784-9888-aa8282f726f8",
       "name": "Merge"
@@ -621,7 +621,7 @@
     },
     {
       "parameters": {
-        "amount": 13
+        "amount": 12
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -809,6 +809,201 @@
           "name": "Postgres (RAG DB)"
         }
       }
+    },
+    {
+      "parameters": {
+        "content": "## Extract the files\n\nThis workflow extract from different file types, \nas following:\n\n- PDF\n- TXT\n- CSV\n- XLS\n- XLSX",
+        "height": 1280,
+        "width": 2288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1920,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "6e55be46-3090-4474-9865-1f13bee9a406",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a classification agent.\nClassify the document provided and return a JSON response only.\n\n## Document\nFilename: {{ $json.filename }}\nContent: {{ $json.content }}\n\n## Output\nReturn this JSON only, no other text:\n\n{\n  \"filename\": \"{{ $json.filename }}\",\n  \"document_type\": \"<type>\",\n  \"category\": \"<subject or domain>\",\n  \"info\": \"<one sentence describing what this document is about>\"\n}\n\n## Rules\n- Base classification strictly on the document content\n- Never fabricate or assume content not present",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2496,
+        512
+      ],
+      "id": "d392eb8e-92d6-4898-9dab-7cf5ce9f3994",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2496,
+        784
+      ],
+      "id": "d7474e08-e55d-4f62-ba6f-81d52f47b89e",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2",
+          "name": "Google Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be56ba83-444f-42ef-bdd0-9bd0a02191e2",
+              "name": "output.text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2784,
+        272
+      ],
+      "id": "bcb9847b-15f0-4fa5-9ea1-47642697d2d9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.1,
+      "position": [
+        3584,
+        256
+      ],
+      "id": "c583396b-27a3-4051-85b1-d721265fd287",
+      "name": "Chat",
+      "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    return `## ${data.filename} \\n ###### **Type:** ${data.document_type} \\n ###### **Category:** ${data.category} \\n ###### **Info:** ${data.info}`;\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3232,
+        256
+      ],
+      "id": "27fe7908-f9ba-49d9-b75c-5f497969d646",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "message": "Please attach the files you want to classify.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.1,
+      "position": [
+        2432,
+        960
+      ],
+      "id": "d9139a61-be33-4a1f-af87-9ea28cf77b54",
+      "name": "Chat3",
+      "webhookId": "0814425b-b2bd-43da-8736-dc1bcbf6fca6"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2656,
+        736
+      ],
+      "id": "3e99d85f-faea-4e56-be4b-2171b63e5cf7",
+      "name": "Postgres Chat Memory1",
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres (RAG DB)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ff65aa27-3148-4eeb-82b5-3696b52906cc",
+              "leftValue": "={{ $('Check Input').first().json.has_file }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2048,
+        800
+      ],
+      "id": "38c30ace-a379-4d39-8ed9-7c1221e49f73",
+      "name": "classification_files_in_message?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const helperItems = $('helper').all();\n\nconst TOKEN_LIMIT = 7000;\nconst CHARS_PER_TOKEN = 4;\nconst MAX_CHARS = Math.floor(TOKEN_LIMIT * CHARS_PER_TOKEN * 0.9);\n\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const text = typeof item.json.fileContent === 'string'\n    ? item.json.fileContent\n    : JSON.stringify(item.json.fileContent || '');\n  const fileName = item.json.fileName || 'Unknown Document';\n  const estimatedTokens = Math.ceil(text.length / CHARS_PER_TOKEN);\n\n  if (!text.trim()) return;\n\n  // Small files unchanged\n  if (estimatedTokens <= TOKEN_LIMIT) {\n    results.push({\n      json: {\n        filename: fileName,\n        content: text,\n        estimated_tokens: estimatedTokens,\n        is_split: false,\n        chunk_index: 1,\n        total_chunks: 1,\n        mode: 'direct'\n      }\n    });\n    return;\n  }\n\n  // Split large files\n  const chunks = [];\n  let start = 0;\n\n  while (start < text.length) {\n    let end = start + MAX_CHARS;\n\n    if (end < text.length) {\n      const nearestSpace = text.lastIndexOf(' ', end);\n      if (nearestSpace > start) end = nearestSpace;\n    }\n\n    const chunkText = text.slice(start, end).trim();\n    if (chunkText.length > 0) chunks.push(chunkText);\n    start = end + 1;\n  }\n\n  const totalChunks = chunks.length;\n\n  chunks.forEach((chunkText, index) => {\n    const chunkIndex = index + 1;\n    results.push({\n      json: {\n        filename: fileName,\n        content: chunkText,\n        estimated_tokens: Math.ceil(chunkText.length / CHARS_PER_TOKEN),\n        is_split: true,\n        chunk_index: chunkIndex,\n        total_chunks: totalChunks,\n        mode: chunkIndex === totalChunks ? 'final' : 'partial'\n      }\n    });\n  });\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        544
+      ],
+      "id": "77fc6e22-baad-406a-8a04-e469fe57a48b",
+      "name": "classification helper"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2464,
+        288
+      ],
+      "id": "b8c192e3-9a8d-4d9f-8991-a98074dc4466",
+      "name": "classification loop"
     }
   ],
   "connections": {
@@ -1118,6 +1313,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "classification_files_in_message?",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1273,6 +1475,108 @@
           }
         ]
       ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "classification loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classification_files_in_message?": {
+      "main": [
+        [
+          {
+            "node": "classification helper",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Chat3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classification helper": {
+      "main": [
+        [
+          {
+            "node": "classification loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classification loop": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1285,9 +1589,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "3b8d9e64-b290-440b-8355-8e0b19215461",
+  "versionId": "e4a86715-ba32-427c-b9c2-9c0a48d27564",
   "activeVersionId": null,
-  "versionCounter": 428,
+  "versionCounter": 551,
   "triggerCount": 0,
   "id": "7tPyu-w8qpUo3oeb-eGdx"
 }
