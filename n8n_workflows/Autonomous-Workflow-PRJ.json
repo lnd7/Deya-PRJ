@@ -1,7 +1,7 @@
 {
   "name": "Autonomous-Workflow-PRJ",
   "description": null,
-  "active": true,
+  "active": false,
   "isArchived": false,
   "nodes": [
     {
@@ -114,7 +114,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=User message: {{ $('When chat message received').first().json.chatInput }}\n\nAnylayse the user message and decide what task from the following is required.\n- Summarisation \n- Clasification\n- Data Extraction\n- RAG Task\n",
+        "text": "=User message: {{ $('When chat message received').first().json.chatInput }}\n\nAnylayse the user message and decide what task from the following is required.\n- Summarisation \n- Clasification\n- Data Extraction\n- Otherwise\n",
         "hasOutputParser": true,
         "options": {}
       },
@@ -231,7 +231,7 @@
                   {
                     "id": "c7c4b30f-f49e-4b5d-90d3-16aa12a8bf2e",
                     "leftValue": "={{ $json.output.Task }}",
-                    "rightValue": "RAG Task",
+                    "rightValue": "Otherwise",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -834,8 +834,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2752,
-        400
+        2784,
+        432
       ],
       "id": "d392eb8e-92d6-4898-9dab-7cf5ce9f3994",
       "name": "AI Agent1"
@@ -1013,27 +1013,143 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        1408,
-        384
+        1280,
+        1248
       ],
-      "id": "a24a83b0-675a-4390-a388-2d0d0ad3a675",
-      "name": "Chat4",
-      "webhookId": "131a28a3-9895-4ba8-9102-c3882683389d"
+      "id": "84552ec5-381c-48fa-8a05-3176f3cf3a76",
+      "name": "Chat5",
+      "webhookId": "eca95a7d-00c3-4d67-8250-93fc787841b5"
     },
     {
       "parameters": {
-        "message": "This task is to be completed SOON.",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be56ba83-444f-42ef-bdd0-9bd0a02191e2",
+              "name": "output.text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2688,
+        1280
+      ],
+      "id": "19696ae8-32c2-4a24-b78f-7f816c1755c9",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.message }}",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        1408,
-        576
+        3072,
+        1280
       ],
-      "id": "84552ec5-381c-48fa-8a05-3176f3cf3a76",
-      "name": "Chat5",
-      "webhookId": "eca95a7d-00c3-4d67-8250-93fc787841b5"
+      "id": "d5fb20d8-b706-4e03-8709-87279a43f202",
+      "name": "Chat4",
+      "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
+    },
+    {
+      "parameters": {
+        "jsCode": "const helperItems = $('helper').all();\n\nconst TOKEN_LIMIT = 4000;\nconst CHARS_PER_TOKEN = 4;\nconst MAX_CHARS = Math.floor(TOKEN_LIMIT * CHARS_PER_TOKEN * 0.9);\nconst MAX_ROWS = 10;\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const fileName = item.json.fileName || 'Unknown Document';\n  const fileNameLower = fileName.toLowerCase();\n  const rawContent = item.json.fileContent;\n\n  let text = '';\n  let trimmed = false;\n\n  if (\n    fileNameLower.endsWith('.csv') ||\n    fileNameLower.endsWith('.xls') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    if (Array.isArray(rawContent)) {\n      const rows = rawContent.slice(0, MAX_ROWS);\n      trimmed = rawContent.length > MAX_ROWS;\n      text = JSON.stringify(rows);\n    } else {\n      text = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent || '');\n    }\n  } else {\n    text = typeof rawContent === 'string'\n      ? rawContent\n      : JSON.stringify(rawContent || '');\n  }\n\n  if (!text.trim()) return;\n\n  if (trimmed) {\n    text = `[Note: File contains more than ${MAX_ROWS} rows. Showing first ${MAX_ROWS} rows only.]\\n\\n${text}`;\n  }\n\n  const estimatedTokens = Math.ceil(text.length / CHARS_PER_TOKEN);\n\n  if (estimatedTokens <= TOKEN_LIMIT) {\n    results.push({\n      json: {\n        filename: fileName,\n        content: text,\n        estimated_tokens: estimatedTokens,\n        is_split: false,\n        chunk_index: 1,\n        total_chunks: 1,\n        mode: 'direct',\n        was_trimmed: trimmed\n      }\n    });\n    return;\n  }\n\n  const chunks = [];\n  let start = 0;\n\n  while (start < text.length) {\n    let end = start + MAX_CHARS;\n    if (end < text.length) {\n      const nearestSpace = text.lastIndexOf(' ', end);\n      if (nearestSpace > start) end = nearestSpace;\n    }\n    const chunkText = text.slice(start, end).trim();\n    if (chunkText.length > 0) chunks.push(chunkText);\n    start = end + 1;\n  }\n\n  const totalChunks = chunks.length;\n  chunks.forEach((chunkText, index) => {\n    const chunkIndex = index + 1;\n    results.push({\n      json: {\n        filename: fileName,\n        content: chunkText,\n        estimated_tokens: Math.ceil(chunkText.length / CHARS_PER_TOKEN),\n        is_split: true,\n        chunk_index: chunkIndex,\n        total_chunks: totalChunks,\n        mode: chunkIndex === totalChunks ? 'final' : 'partial',\n        was_trimmed: trimmed\n      }\n    });\n  });\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        1296
+      ],
+      "id": "82f45010-3e3b-48eb-8918-89138f5c8780",
+      "name": "data extraction helper"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2352,
+        1296
+      ],
+      "id": "9926b190-4ff6-45e4-89a5-0e76c47ee64a",
+      "name": "data extraction loop"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst cleanKey = (key) => key.replace(/_/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());\n\nconst formatSection = (obj) =>\n  Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** ${v}`)\n    .join('\\n');\n\nconst formatFinancials = (obj) => {\n  return Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** &nbsp;&nbsp; ${v}`)\n    .join('\\n');\n};\n\nconst formatLineItems = (lineItems, currency = '') => {\n  const c = currency || '';\n  return lineItems.map((item, i) => {\n    const desc = item.description || 'Item';\n    const code = item.product_code ? ` *(${item.product_code})*` : '';\n    const qty = item.quantity || '-';\n    const price = item.unit_price ? `${c}${item.unit_price}` : '-';\n    const total = item.line_total ? `${c}${item.line_total}` : '-';\n    return `**${i + 1}. ${desc}**${code}\\n- Qty: ${qty} \u00d7 ${price} = **${total}**`;\n  }).join('\\n\\n');\n};\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    const d = data.extracted_data || {};\n\n    let output = `# ${data.filename}\\n###### Type: ${data.document_type}\\n\\n`;\n\n    if (d.parties && Object.values(d.parties).some(v => v))\n      output += `**Parties:**\\n${formatSection(d.parties)}\\n\\n`;\n\n    if (d.dates && Object.values(d.dates).some(v => v))\n      output += `**Dates:**\\n${formatSection(d.dates)}\\n\\n`;\n\n    if (d.reference_numbers && Object.values(d.reference_numbers).some(v => v))\n      output += `**Reference Numbers:**\\n${formatSection(d.reference_numbers)}\\n\\n`;\n\n    const currency = d.financials \n  ? (Object.entries(d.financials).find(([k]) => k === 'currency')?.[1] || '')\n  : '';\n\n  if (d.financials && Object.values(d.financials).some(v => v))\n  output += `**Financials:**\\n${formatFinancials(d.financials)}\\n\\n`;\n\n  if (d.line_items && d.line_items.length)\n  output += `**Line Items:**\\n\\n${formatLineItems(d.line_items, currency)}\\n\\n`;\n\n    if (d.payment_details && Object.values(d.payment_details).some(v => v))\n      output += `**Payment Details:**\\n${formatSection(d.payment_details)}\\n\\n`;\n\n    if (data.notes)\n      output += `**Notes:** ${data.notes}`;\n\n    return output;\n\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2896,
+        1280
+      ],
+      "id": "75a3e61a-d8e7-41f6-8145-454a92855845",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a data extraction agent.\nYour job is to extract key structured information from documents such as bills, invoices, receipts, contracts, and financial documents.\n\n## Document\nFilename: {{ $json.filename }}\nContent: {{ $json.content }}\n\n## Output\nReturn this JSON only, no other text:\n\n{\n  \"filename\": \"{{ $json.filename }}\",\n  \"document_type\": \"<Invoice | Bill | Reciept | Unknown>\",\n  \"extracted_data\": {\n    \"dates\": {},\n    \"reference_numbers\": {},\n    \"parties\": {},\n    \"financials\": {},\n    \"line_items\": [],\n    \"payment_details\": {}\n  },\n  \"notes\": \"<anything unusual, missing, or unsupported>\"\n}\n\n\n## Rules\n- If document is a dataset or unsupported type, return document_type as Otherwise and explain in notes\n- Extract ONLY what is explicitly present, never fabricate\n- Missing fields should be null\n- Preserve original values exactly as they appear",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2304,
+        1552
+      ],
+      "id": "53982e06-e3c6-4369-8fc0-380449c5f11a",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2304,
+        1776
+      ],
+      "id": "75286067-069d-4ef2-ace0-13f8bafa2cfd",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2",
+          "name": "Google Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2448,
+        1824
+      ],
+      "id": "22f6e04a-31fd-40ab-b053-08a5d01a6e4e",
+      "name": "Postgres Chat Memory3",
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres (RAG DB)"
+        }
+      }
     }
   ],
   "connections": {
@@ -1353,7 +1469,7 @@
         ],
         [
           {
-            "node": "Chat4",
+            "node": "data extraction helper",
             "type": "main",
             "index": 0
           }
@@ -1621,6 +1737,90 @@
           }
         ]
       ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data extraction helper": {
+      "main": [
+        [
+          {
+            "node": "data extraction loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data extraction loop": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Chat4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory3": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "data extraction loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1635,9 +1835,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "f823bc5c-7202-4e17-8756-657b6c922ba3",
-  "activeVersionId": "20462391-5bdc-498d-8165-527f33e99402",
-  "versionCounter": 633,
+  "versionId": "8f18b181-3c6c-4918-abb6-b3bec66aa16e",
+  "activeVersionId": null,
+  "versionCounter": 784,
   "triggerCount": 1,
   "id": "7tPyu-w8qpUo3oeb-eGdx"
 }
