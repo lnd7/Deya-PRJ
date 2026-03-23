@@ -6,13 +6,13 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "let binaryData = $input.first()?.binary;\nif (!binaryData) {\n  try {\n    binaryData = $('When chat message received').item.binary;\n  } catch (e) {\n    binaryData = null;\n  }\n}\n\nif (!binaryData || Object.keys(binaryData).length === 0) {\n  return [{ \n    json: { \n      text: \"No attached files found. Please try uploading again.\",\n      error: true\n    } \n  }];\n}\n\nconst SUPPORTED_TYPES = ['pdf', 'txt', 'csv', 'xls', 'xlsx'];\nconst results = [];\nconst rejected = [];\n\nfor (const key of Object.keys(binaryData)) {\n  const file = binaryData[key];\n  const fileName = (file.fileName || 'unknown');\n  const fileNameLower = fileName.toLowerCase();\n  const mimeType = file.mimeType || '';\n\n  let fileType = null;\n\n  // PDF\n  if (mimeType.includes('pdf') || fileNameLower.endsWith('.pdf')) {\n    fileType = 'pdf';\n  }\n  // Text\n  else if (\n    mimeType.includes('text/plain') ||\n    fileNameLower.endsWith('.txt') ||\n    fileNameLower.endsWith('.md') ||\n    fileNameLower.endsWith('.rtf')\n  ) {\n    fileType = 'txt';\n  }\n  // CSV\n  else if (\n    mimeType.includes('text/csv') ||\n    mimeType.includes('application/csv') ||\n    fileNameLower.endsWith('.csv')\n  ) {\n    fileType = 'csv';\n  }\n  // XLS\n  else if (\n    mimeType.includes('application/vnd.ms-excel') ||\n    fileNameLower.endsWith('.xls')\n  ) {\n    fileType = 'xls';\n  }\n  // XLSX\n  else if (\n    mimeType.includes('spreadsheetml') ||\n    mimeType.includes('openxmlformats') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    fileType = 'xlsx';\n  }\n  // \u2500\u2500 Unsupported \u2500\u2500\n  else {\n    rejected.push(fileName);\n    continue; // skip this file\n  }\n\n  results.push({\n    json: {\n      fileName: fileName,\n      mimeType: mimeType,\n      fileType: fileType\n    },\n    binary: {\n      data: file\n    }\n  });\n}\n\n//If ALL files rejected\nif (results.length === 0) {\n  return [{\n    json: {\n      error: true,\n      text: `Unsupported file type(s): ${rejected.join(', ')}. Supported formats are: PDF, TXT, CSV, XLS, XLSX.`\n    }\n  }];\n}\n\n// If some files rejected, log warning but continue\nif (rejected.length > 0) {\n  results[0].json.warning = `Skipped unsupported file(s): ${rejected.join(', ')}`;\n}\n\nreturn results;\n"
+        "jsCode": "let binaryData = $input.first()?.binary;\nif (!binaryData) {\n  try {\n    binaryData = $('When chat message received').item.binary;\n  } catch (e) {\n    binaryData = null;\n  }\n}\n\nif (!binaryData || Object.keys(binaryData).length === 0) {\n  return [{ \n    json: { \n      text: \"No attached files found. Please try uploading again.\",\n      error: true\n    } \n  }];\n}\n\nconst results = [];\nconst rejected = [];\n\nfor (const key of Object.keys(binaryData)) {\n  const file = binaryData[key];\n  const fileName = (file.fileName || 'unknown');\n  const fileNameLower = fileName.toLowerCase();\n  const mimeType = file.mimeType || '';\n\n  let fileType = null;\n\n  // PDF\n  if (mimeType.includes('pdf') || fileNameLower.endsWith('.pdf')) {\n    fileType = 'pdf';\n  }\n  \n  // TXT\n  else if (\n    mimeType.includes('text') ||\n    fileNameLower.endsWith('.txt') \n  ) {\n    fileType = 'txt';\n  }\n  \n  // DOCX\n  else if (\n    mimeType.includes('wordprocessingml') ||\n    fileNameLower.endsWith('.docx') \n  ) {\n    fileType = 'docx';\n  }\n\n  // CSV\n  else if (\n    mimeType.includes('csv') ||\n    fileNameLower.endsWith('.csv')\n  ) {\n    fileType = 'csv';\n  }\n\n  // XLS\n  else if (\n    mimeType.includes('vnd.ms-excel') ||\n    fileNameLower.endsWith('.xls')\n  ) {\n    fileType = 'xls';\n  }\n\n  // XLSX\n  else if (\n    mimeType.includes('spreadsheetml') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    fileType = 'xlsx';\n  }\n\n  // Unsupported Files\n  else {\n    rejected.push(fileName);\n    continue;\n  }\n\n  results.push({\n    json: {\n      fileName: fileName,\n      mimeType: mimeType,\n      fileType: fileType\n    },\n    binary: {\n      data: file\n    }\n  });\n}\n\nif (results.length === 0) {\n  return [{\n    json: {\n      error: true,\n      text: `Unsupported file type(s): ${rejected.join(', ')}. Supported formats are: PDF, TXT, CSV, XLS, XLSX, DOCX.`\n    }\n  }];\n}\n\nif (rejected.length > 0) {\n  results[0].json.warning = `Skipped unsupported file(s): ${rejected.join(', ')}`;\n}\n\nreturn results;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         -1488,
-        1136
+        1152
       ],
       "id": "a533467b-d007-4bff-b8db-2d8ed6b6846c",
       "name": "Document_Tool"
@@ -45,8 +45,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -848,
-        544
+        -880,
+        624
       ],
       "id": "1489e677-f73f-474c-bcd1-ce92cb2f27ba",
       "name": "PDF_Extractor"
@@ -262,8 +262,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -848,
-        752
+        -880,
+        832
       ],
       "id": "1750990b-df30-4d66-bc77-c9e151209b5d",
       "name": "Text_Extractor"
@@ -275,8 +275,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -608,
-        1008
+        -672,
+        1200
       ],
       "id": "1555c6cc-da92-497a-ae9c-661af0c952f3",
       "name": "CSV_Extractor"
@@ -289,8 +289,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -608,
-        1296
+        -672,
+        1488
       ],
       "id": "6916645b-32df-472e-8615-067927257bf9",
       "name": "XLS_Extractor"
@@ -303,8 +303,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -640,
-        1568
+        -704,
+        1760
       ],
       "id": "87d7dd35-9326-4f6b-b906-45ea6aa236ca",
       "name": "XLSX_Extractor"
@@ -348,6 +348,29 @@
                     "id": "53fd4943-1564-48c1-99a1-2d88cffe6185",
                     "leftValue": "={{ $json.fileType }}",
                     "rightValue": "txt",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "05a92d3e-29bf-454c-a653-b7dbd874ade9",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "docx",
                     "operator": {
                       "type": "string",
                       "operation": "equals",
@@ -447,8 +470,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        544
+        -464,
+        624
       ],
       "id": "5d757be5-90bf-4830-9437-102c9aa70999",
       "name": "pdf helper"
@@ -460,8 +483,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        1008
+        -464,
+        1200
       ],
       "id": "b57c3a9a-6901-421e-976c-4ae4271b5f9d",
       "name": "CSV helper"
@@ -473,8 +496,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        1296
+        -464,
+        1488
       ],
       "id": "2121c45a-8dee-4a27-bce8-8fefe0ecd286",
       "name": "XLS helper"
@@ -486,8 +509,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        752
+        -464,
+        832
       ],
       "id": "d17c7804-bd29-4c71-9b10-514f76d57ef4",
       "name": "Text helper"
@@ -499,8 +522,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        1568
+        -464,
+        1760
       ],
       "id": "5fdba658-d6fa-4de6-b2e5-5088a465c8a3",
       "name": "XLSX helper"
@@ -512,8 +535,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -848,
-        1552
+        -896,
+        1744
       ],
       "id": "9f3d29f1-fa48-4c59-8fdb-5fa5e69d6e04",
       "name": "XLSX files loop"
@@ -525,8 +548,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -848,
-        1280
+        -896,
+        1472
       ],
       "id": "99337519-586b-41e4-8ad0-bfc6f8ff75a3",
       "name": "XLS files loop"
@@ -538,8 +561,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -848,
-        992
+        -896,
+        1184
       ],
       "id": "6ce11f86-2185-45c1-a834-bdd667ab870b",
       "name": "CSV files loop"
@@ -559,13 +582,13 @@
     },
     {
       "parameters": {
-        "numberInputs": 5
+        "numberInputs": 6
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
         0,
-        992
+        976
       ],
       "id": "298d3484-db98-4784-9888-aa8282f726f8",
       "name": "Merge"
@@ -598,13 +621,13 @@
     },
     {
       "parameters": {
-        "content": "## Extract the files\n\nThis workflow extract from different file types, \nas following:\n\n- PDF\n- TXT\n- CSV\n- XLS\n- XLSX",
-        "height": 1280,
+        "content": "## Extract the files\n\nThis workflow extract from different file types, \nas following:\n\n- PDF\n- TXT\n- DOCX\n- CSV\n- XLS\n- XLSX",
+        "height": 1456,
         "width": 2288
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1920,
+        -1936,
         512
       ],
       "typeVersion": 1,
@@ -613,7 +636,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const helperItems = $('helper').all();\n\nconst CHARS_PER_TOKEN = 4;\nconst PREVIEW_TOKENS = 1000;\nconst PREVIEW_CHARS = PREVIEW_TOKENS * CHARS_PER_TOKEN; // 4000 chars\nconst MAX_ROWS = 5;\n\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const fileName = item.json.fileName || 'Unknown Document';\n  const fileNameLower = fileName.toLowerCase();\n  const rawContent = item.json.fileContent;\n\n  let text = '';\n  let note = '';\n\n  // Data Set files\n  if (\n    fileNameLower.endsWith('.csv') ||\n    fileNameLower.endsWith('.xls') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    if (Array.isArray(rawContent)) {\n      const rows = rawContent.slice(0, MAX_ROWS);\n      if (rawContent.length > MAX_ROWS)\n        note = `[Preview: first ${MAX_ROWS} of ${rawContent.length} rows]`;\n      text = JSON.stringify(rows);\n    } else {\n      text = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent || '');\n    }\n  }\n  // Text/PDF files\n  else {\n    const full = typeof rawContent === 'string'\n      ? rawContent\n      : JSON.stringify(rawContent || '');\n\n    if (full.length > PREVIEW_CHARS) {\n      text = full.slice(0, PREVIEW_CHARS);\n      \n      const lastSpace = text.lastIndexOf(' ');\n      if (lastSpace > 0) text = text.slice(0, lastSpace);\n      note = `[Preview: first ${PREVIEW_TOKENS} tokens of document]`;\n    } else {\n      text = full;\n    }\n  }\n\n  if (!text.trim()) return;\n\n  if (note) text = `${note}\\n\\n${text}`;\n\n  results.push({\n    json: {\n      filename: fileName,\n      content: text,\n      estimated_tokens: Math.ceil(text.length / CHARS_PER_TOKEN),\n      mode: 'direct'\n    }\n  });\n});\n\nreturn results;"
+        "jsCode": "const helperItems = $('helper').all();\n\nconst CHARS_PER_TOKEN = 4;\nconst PREVIEW_TOKENS = 1000;\nconst PREVIEW_CHARS = PREVIEW_TOKENS * CHARS_PER_TOKEN; // 4000 chars\nconst MAX_ROWS = 5;\n\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const fileName = item.json.fileName || 'Unknown Document';\n  const fileNameLower = fileName.toLowerCase();\n  const rawContent = item.json.fileContent;\n\n  let text = '';\n  let note = '';\n\n  // Data Set files\n  if (\n    fileNameLower.endsWith('.csv') ||\n    fileNameLower.endsWith('.xls') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    if (Array.isArray(rawContent)) {\n      const rows = rawContent.slice(0, MAX_ROWS);\n      if (rawContent.length > MAX_ROWS)\n        note = `[Preview: first ${MAX_ROWS} of ${rawContent.length} rows]`;\n      text = JSON.stringify(rows);\n    } else {\n      text = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent || '');\n    }\n  }\n  // PDF, TXT and DOCX files\n  else {\n    const full = typeof rawContent === 'string'\n      ? rawContent\n      : JSON.stringify(rawContent || '');\n\n    if (full.length > PREVIEW_CHARS) {\n      text = full.slice(0, PREVIEW_CHARS);\n      \n      const lastSpace = text.lastIndexOf(' ');\n      if (lastSpace > 0) text = text.slice(0, lastSpace);\n      note = `[Preview: first ${PREVIEW_TOKENS} tokens of document]`;\n    } else {\n      text = full;\n    }\n  }\n\n  if (!text.trim()) return;\n\n  if (note) text = `${note}\\n\\n${text}`;\n\n  results.push({\n    json: {\n      filename: fileName,\n      content: text,\n      estimated_tokens: Math.ceil(text.length / CHARS_PER_TOKEN),\n      mode: 'direct'\n    }\n  });\n});\n\nreturn results;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1004,6 +1027,19 @@
       "id": "d5fb20d8-b706-4e03-8709-87279a43f202",
       "name": "data extractor output",
       "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
+    },
+    {
+      "parameters": {
+        "jsCode": "const mammoth = require('mammoth');\n\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const binary = item.binary || {};\n  const binaryKey = Object.keys(binary)[0];\n\n  if (!binaryKey) continue;\n\n  const fileName = binary[binaryKey]?.fileName || 'Unknown.docx';\n  const buffer = await this.helpers.getBinaryDataBuffer(\n    items.indexOf(item), \n    binaryKey\n  );\n\n  try {\n    const result = await mammoth.extractRawText({ buffer });\n\n    results.push({\n      json: {\n        fileName: fileName,\n        fileContent: result.value\n      },\n      binary: {\n        data: binary[binaryKey]\n      }\n    });\n  } catch (err) {\n    results.push({\n      json: {\n        fileName: fileName,\n        fileContent: '',\n        error: err.message\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -672,
+        1008
+      ],
+      "id": "c733bbc2-fa5f-4252-9677-dbcc51443ed8",
+      "name": "DOCX_Extractor_Code"
     }
   ],
   "connections": {
@@ -1164,6 +1200,13 @@
         ],
         [
           {
+            "node": "DOCX_Extractor_Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "CSV files loop",
             "type": "main",
             "index": 0
@@ -1224,7 +1267,7 @@
           {
             "node": "Merge",
             "type": "main",
-            "index": 4
+            "index": 5
           }
         ],
         [
@@ -1242,7 +1285,7 @@
           {
             "node": "Merge",
             "type": "main",
-            "index": 3
+            "index": 4
           }
         ],
         [
@@ -1260,7 +1303,7 @@
           {
             "node": "Merge",
             "type": "main",
-            "index": 2
+            "index": 3
           }
         ],
         [
@@ -1610,6 +1653,17 @@
           }
         ]
       ]
+    },
+    "DOCX_Extractor_Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1624,9 +1678,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "7bbc77c5-52ea-4b41-a217-fe41d9eb4827",
+  "versionId": "af8fd31f-ab10-473e-a547-5689a508cce5",
   "activeVersionId": null,
-  "versionCounter": 888,
+  "versionCounter": 992,
   "triggerCount": 1,
   "id": "7tPyu-w8qpUo3oeb-eGdx"
 }
