@@ -6,7 +6,7 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "let binaryData = $input.first()?.binary;\nif (!binaryData) {\n  try {\n    binaryData = $('When chat message received').item.binary;\n  } catch (e) {\n    binaryData = null;\n  }\n}\n\nif (!binaryData || Object.keys(binaryData).length === 0) {\n  return [{ \n    json: { \n      text: \"No attached files found. Please try uploading again.\",\n      error: true\n    } \n  }];\n}\n\nconst results = [];\nconst rejected = [];\n\nfor (const key of Object.keys(binaryData)) {\n  const file = binaryData[key];\n  const fileName = (file.fileName || 'unknown');\n  const fileNameLower = fileName.toLowerCase();\n  const mimeType = file.mimeType || '';\n\n  let fileType = null;\n\n  // PDF\n  if (mimeType.includes('pdf') || fileNameLower.endsWith('.pdf')) {\n    fileType = 'pdf';\n  }\n  \n  // TXT\n  else if (\n    mimeType.includes('text') ||\n    fileNameLower.endsWith('.txt') \n  ) {\n    fileType = 'txt';\n  }\n  \n  // DOCX\n  else if (\n    mimeType.includes('wordprocessingml') ||\n    fileNameLower.endsWith('.docx') \n  ) {\n    fileType = 'docx';\n  }\n\n  // CSV\n  else if (\n    mimeType.includes('csv') ||\n    fileNameLower.endsWith('.csv')\n  ) {\n    fileType = 'csv';\n  }\n\n  // XLS\n  else if (\n    mimeType.includes('vnd.ms-excel') ||\n    fileNameLower.endsWith('.xls')\n  ) {\n    fileType = 'xls';\n  }\n\n  // XLSX\n  else if (\n    mimeType.includes('spreadsheetml') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    fileType = 'xlsx';\n  }\n\n  // Unsupported Files\n  else {\n    rejected.push(fileName);\n    continue;\n  }\n\n  results.push({\n    json: {\n      fileName: fileName,\n      mimeType: mimeType,\n      fileType: fileType\n    },\n    binary: {\n      data: file\n    }\n  });\n}\n\nif (results.length === 0) {\n  return [{\n    json: {\n      error: true,\n      text: `Unsupported file type(s): ${rejected.join(', ')}. Supported formats are: PDF, TXT, CSV, XLS, XLSX, DOCX.`\n    }\n  }];\n}\n\nif (rejected.length > 0) {\n  results[0].json.warning = `Skipped unsupported file(s): ${rejected.join(', ')}`;\n}\n\nreturn results;"
+        "jsCode": "let binaryData = $input.first()?.binary;\nif (!binaryData) {\n  try {\n    binaryData = $('When chat message received').item.binary;\n  } catch (e) {\n    binaryData = null;\n  }\n}\n\nif (!binaryData || Object.keys(binaryData).length === 0) {\n  return [{ \n    json: { \n      text: \"No attached files found. Please try uploading again.\",\n      error: true\n    } \n  }];\n}\n\nconst results = [];\nconst rejected = [];\n\nfor (const key of Object.keys(binaryData)) {\n  const file = binaryData[key];\n  const fileName = (file.fileName || 'unknown');\n  const fileNameLower = fileName.toLowerCase();\n  const mimeType = file.mimeType || '';\n\n  let fileType = null;\n\n  // PDF\n  if (mimeType.includes('pdf') || fileNameLower.endsWith('.pdf')) {\n    fileType = 'pdf';\n  }\n  \n  // TXT\n  else if (\n    mimeType.includes('text') ||\n    fileNameLower.endsWith('.txt') \n  ) {\n    fileType = 'txt';\n  }\n  \n  // DOCX\n  else if (\n    mimeType.includes('wordprocessingml') ||\n    fileNameLower.endsWith('.docx') \n  ) {\n    fileType = 'docx';\n  }\n\n  // CSV\n  else if (\n    mimeType.includes('csv') ||\n    fileNameLower.endsWith('.csv')\n  ) {\n    fileType = 'csv';\n  }\n\n  // XLS\n  else if (\n    mimeType.includes('vnd.ms-excel') ||\n    fileNameLower.endsWith('.xls')\n  ) {\n    fileType = 'xls';\n  }\n\n  // XLSX\n  else if (\n    mimeType.includes('spreadsheetml') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    fileType = 'xlsx';\n  }\n\n  // Unsupported Files\n  else {\n    results.push({\n      json: {\n        fileName: fileName,\n        mimeType: mimeType,\n        fileType: 'unsupported'\n      }\n    });\n  }\n\n  results.push({\n    json: {\n      fileName: fileName,\n      mimeType: mimeType,\n      fileType: fileType\n    },\n    binary: {\n      data: file\n    }\n  });\n}\n\nif (results.length === 0) {\n  return [{\n    json: {\n      error: true,\n      text: `Unsupported file type(s): ${rejected.join(', ')}. Supported formats are: PDF, TXT, CSV, XLS, XLSX, DOCX.`\n    }\n  }];\n}\n\nif (rejected.length > 0) {\n  results[0].json.warning = `Skipped unsupported file(s): ${rejected.join(', ')}`;\n}\n\nreturn results;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -92,8 +92,8 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        960,
-        1232
+        1168,
+        1392
       ],
       "id": "0d46b4b8-9424-42c5-af3d-c55af95a94a7",
       "name": "Structured Output Parser"
@@ -121,8 +121,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        784,
-        1040
+        992,
+        1200
       ],
       "id": "a997f61e-c2e4-4b3d-8d8d-694bf57b0075",
       "name": "Orchestrator",
@@ -137,8 +137,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        720,
-        1232
+        928,
+        1392
       ],
       "id": "f4cf2ed3-a680-440a-a48e-182de0d42ef4",
       "name": "Orchestrator-LLM",
@@ -248,8 +248,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        1152,
-        1008
+        1360,
+        1168
       ],
       "id": "c01431f6-d8d0-4267-ad5c-60d069967f40",
       "name": "Switch Task"
@@ -449,6 +449,29 @@
                 ],
                 "combinator": "and"
               }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "79407d95-c4bb-4d4d-9871-c04be1a1ddec",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "unsupported",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
             }
           ]
         },
@@ -600,8 +623,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2256,
-        -464
+        576,
+        -32
       ],
       "id": "bb112df7-1e82-4ed1-b536-3063f2cc4bb0",
       "name": "summariser helper"
@@ -613,22 +636,22 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        2528,
-        -720
+        848,
+        -288
       ],
       "id": "b1fddd50-71de-4fcf-842d-7e1920e713b0",
       "name": "summariser loop"
     },
     {
       "parameters": {
-        "content": "## Extract the files\n\nThis workflow extract from different file types, \nas following:\n\n- PDF\n- TXT\n- DOCX\n- CSV\n- XLS\n- XLSX",
-        "height": 1456,
+        "content": "## Extract the files\n\n#### This workflow extract from different file types, as following:\n\n##### - PDF\n##### - TXT\n##### - DOCX\n##### - CSV\n##### - XLS\n##### - XLSX",
+        "height": 1632,
         "width": 2288
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         -1936,
-        512
+        560
       ],
       "typeVersion": 1,
       "id": "6e55be46-3090-4474-9865-1f13bee9a406",
@@ -642,7 +665,7 @@
       "typeVersion": 2,
       "position": [
         2256,
-        352
+        -80
       ],
       "id": "77fc6e22-baad-406a-8a04-e469fe57a48b",
       "name": "classification helper"
@@ -654,26 +677,11 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        2560,
-        192
+        2672,
+        -288
       ],
       "id": "b8c192e3-9a8d-4d9f-8991-a98074dc4466",
       "name": "classification loop"
-    },
-    {
-      "parameters": {
-        "message": "This task is to be completed SOON.",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.chat",
-      "typeVersion": 1.1,
-      "position": [
-        1328,
-        1920
-      ],
-      "id": "84552ec5-381c-48fa-8a05-3176f3cf3a76",
-      "name": "Chat5",
-      "webhookId": "eca95a7d-00c3-4d67-8250-93fc787841b5"
     },
     {
       "parameters": {
@@ -682,8 +690,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1920,
-        1296
+        2320,
+        1200
       ],
       "id": "82f45010-3e3b-48eb-8918-89138f5c8780",
       "name": "data extraction helper"
@@ -695,8 +703,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        2352,
-        1296
+        2752,
+        1200
       ],
       "id": "9926b190-4ff6-45e4-89a5-0e76c47ee64a",
       "name": "data extraction loop"
@@ -710,8 +718,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2544,
-        -496
+        864,
+        -64
       ],
       "id": "48dc58aa-888b-44dd-8a73-0b30f06430b9",
       "name": "Summariser Agent"
@@ -724,8 +732,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        2544,
-        -304
+        864,
+        128
       ],
       "id": "3a222dc3-4b16-4384-880b-8193e3a9bd5a",
       "name": "summariser-LLM",
@@ -743,8 +751,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        2880,
-        -496
+        1200,
+        -64
       ],
       "id": "053c2718-f36d-48fc-ac3e-6f50190f7871",
       "name": "Wait",
@@ -767,8 +775,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2832,
-        -736
+        1152,
+        -304
       ],
       "id": "7fb6cca3-6e71-445d-8f9b-4762d8706898",
       "name": "summeriser edit field"
@@ -780,8 +788,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3088,
-        -736
+        1408,
+        -304
       ],
       "id": "195291e8-1a3c-42c4-8ab6-d96ccaba09a6",
       "name": "summeriser parser"
@@ -794,8 +802,8 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        3344,
-        -736
+        1664,
+        -304
       ],
       "id": "a5d8fd6b-70cb-45d2-ab76-a856c350430f",
       "name": "summeriser output",
@@ -810,8 +818,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2576,
-        352
+        2688,
+        -128
       ],
       "id": "d392eb8e-92d6-4898-9dab-7cf5ce9f3994",
       "name": "Classifier Agent"
@@ -824,8 +832,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        2544,
-        592
+        2656,
+        112
       ],
       "id": "d7474e08-e55d-4f62-ba6f-81d52f47b89e",
       "name": "classifier-LLM",
@@ -841,8 +849,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        2704,
-        -272
+        1024,
+        160
       ],
       "id": "9786e36e-2f7a-425e-939b-3c2fab524ca5",
       "name": "summariser chat memory",
@@ -860,8 +868,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        2704,
-        576
+        2816,
+        96
       ],
       "id": "3e99d85f-faea-4e56-be4b-2171b63e5cf7",
       "name": "classifier chat memory",
@@ -889,8 +897,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2880,
-        176
+        2992,
+        -304
       ],
       "id": "bcb9847b-15f0-4fa5-9ea1-47642697d2d9",
       "name": "classifier edit field"
@@ -902,8 +910,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3120,
-        176
+        3232,
+        -304
       ],
       "id": "27fe7908-f9ba-49d9-b75c-5f497969d646",
       "name": "classifier parser"
@@ -916,8 +924,8 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        3360,
-        176
+        3472,
+        -304
       ],
       "id": "c583396b-27a3-4051-85b1-d721265fd287",
       "name": "classifier output",
@@ -930,8 +938,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        2432,
-        1808
+        2832,
+        1712
       ],
       "id": "22f6e04a-31fd-40ab-b053-08a5d01a6e4e",
       "name": "data extraction chat memory",
@@ -950,8 +958,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        2304,
-        1776
+        2704,
+        1680
       ],
       "id": "75286067-069d-4ef2-ace0-13f8bafa2cfd",
       "name": "data extraction-LLM",
@@ -971,8 +979,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2304,
-        1552
+        2704,
+        1456
       ],
       "id": "53982e06-e3c6-4369-8fc0-380449c5f11a",
       "name": "Data Extractor Agent"
@@ -994,21 +1002,21 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2656,
-        1280
+        3056,
+        1184
       ],
       "id": "19696ae8-32c2-4a24-b78f-7f816c1755c9",
       "name": "data extractor edit field"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nconst cleanKey = (key) => key.replace(/_/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());\n\nconst formatSection = (obj) =>\n  Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** ${v}`)\n    .join('\\n');\n\nconst formatFinancials = (obj) => {\n  return Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** &nbsp;&nbsp; ${v}`)\n    .join('\\n');\n};\n\nconst formatLineItems = (lineItems, currency = '') => {\n  const c = currency || '';\n  return lineItems.map((item, i) => {\n    const desc = item.description || 'Item';\n    const code = item.product_code ? ` *(${item.product_code})*` : '';\n    const qty = item.quantity || '-';\n    const price = item.unit_price ? `${c}${item.unit_price}` : '-';\n    const total = item.line_total ? `${c}${item.line_total}` : '-';\n    return `**${i + 1}. ${desc}**${code}\\n- Qty: ${qty} \u00d7 ${price} = **${total}**`;\n  }).join('\\n\\n');\n};\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    const d = data.extracted_data || {};\n\n    let output = `# ${data.filename}\\n###### Type: ${data.document_type}\\n\\n`;\n\n    if (d.parties && Object.values(d.parties).some(v => v))\n      output += `**Parties:**\\n${formatSection(d.parties)}\\n\\n`;\n\n    if (d.dates && Object.values(d.dates).some(v => v))\n      output += `**Dates:**\\n${formatSection(d.dates)}\\n\\n`;\n\n    if (d.reference_numbers && Object.values(d.reference_numbers).some(v => v))\n      output += `**Reference Numbers:**\\n${formatSection(d.reference_numbers)}\\n\\n`;\n\n    const currency = d.financials \n  ? (Object.entries(d.financials).find(([k]) => k === 'currency')?.[1] || '')\n  : '';\n\n  if (d.financials && Object.values(d.financials).some(v => v))\n  output += `**Financials:**\\n${formatFinancials(d.financials)}\\n\\n`;\n\n  if (d.line_items && d.line_items.length)\n  output += `**Line Items:**\\n\\n${formatLineItems(d.line_items, currency)}\\n\\n`;\n\n    if (d.payment_details && Object.values(d.payment_details).some(v => v))\n      output += `**Payment Details:**\\n${formatSection(d.payment_details)}\\n\\n`;\n\n    if (data.notes)\n      output += `**Notes:** ${data.notes}`;\n\n    return output;\n\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
+        "jsCode": "const items = $input.all();\n\nconst cleanKey = (key) => key.replace(/_/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());\n\nconst formatSection = (obj) =>\n  Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** ${v}`)\n    .join('\\n');\n\nconst formatFinancials = (obj) => {\n  return Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** &nbsp;&nbsp; ${v}`)\n    .join('\\n');\n};\n\nconst formatLineItems = (lineItems, currency = '') => {\n  const c = currency || '';\n  return lineItems.map((item, i) => {\n    const desc = item.description || 'Item';\n    const code = item.product_code ? ` *(${item.product_code})*` : '';\n    const qty = item.quantity || '-';\n    const price = item.unit_price ? `${c}${item.unit_price}` : '-';\n    const total = item.line_total ? `${c}${item.line_total}` : '-';\n    return `**${i + 1}. ${desc}**${code}\\n- Qty: ${qty} \u00d7 ${price} = **${total}**`;\n  }).join('\\n\\n');\n};\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    const d = data.extracted_data || {};\n\n    let output = `## ${data.filename}\\n###### Type: ${data.document_type}\\n\\n`;\n\n    if (d.parties && Object.values(d.parties).some(v => v))\n      output += `**Parties:**\\n${formatSection(d.parties)}\\n\\n`;\n\n    if (d.dates && Object.values(d.dates).some(v => v))\n      output += `**Dates:**\\n${formatSection(d.dates)}\\n\\n`;\n\n    if (d.reference_numbers && Object.values(d.reference_numbers).some(v => v))\n      output += `**Reference Numbers:**\\n${formatSection(d.reference_numbers)}\\n\\n`;\n\n    const currency = d.financials \n  ? (Object.entries(d.financials).find(([k]) => k === 'currency')?.[1] || '')\n  : '';\n\n  if (d.financials && Object.values(d.financials).some(v => v))\n  output += `**Financials:**\\n${formatFinancials(d.financials)}\\n\\n`;\n\n  if (d.line_items && d.line_items.length)\n  output += `**Line Items:**\\n\\n${formatLineItems(d.line_items, currency)}\\n\\n`;\n\n    if (d.payment_details && Object.values(d.payment_details).some(v => v))\n      output += `**Payment Details:**\\n${formatSection(d.payment_details)}\\n\\n`;\n\n    if (data.notes)\n      output += `**Notes:** ${data.notes}`;\n\n    return output;\n\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2880,
-        1280
+        3280,
+        1184
       ],
       "id": "75a3e61a-d8e7-41f6-8145-454a92855845",
       "name": "data extractor parser"
@@ -1021,8 +1029,8 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        3088,
-        1280
+        3488,
+        1184
       ],
       "id": "d5fb20d8-b706-4e03-8709-87279a43f202",
       "name": "data extractor output",
@@ -1040,6 +1048,218 @@
       ],
       "id": "c733bbc2-fa5f-4252-9677-dbcc51443ed8",
       "name": "DOCX_Extractor_Code"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        16
+      ],
+      "id": "7247f1cd-0545-4bcc-b320-097b68e6a6f5",
+      "name": "Chat history-LLM",
+      "credentials": {
+        "groqApi": {
+          "id": "3",
+          "name": "Groq"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User message: {{ $('When chat message received').first().json.chatInput }}\n\nYou are a helpful agent that answers questions based on the chat history.\n\nYou must be precise and concise, never answer the questions based on something other than chat memory, therefore apologise if you can't find anything related.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -560,
+        -208
+      ],
+      "id": "5cde93a8-237e-4a7f-ba8b-8dab2f185fd1",
+      "name": "Chat History Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        0
+      ],
+      "id": "3b219806-8b2a-4283-bf47-0599d0334cb8",
+      "name": "History Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres (RAG DB)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        -208
+      ],
+      "id": "f6d6bd3d-cfd6-430c-9a14-83d378620ae9",
+      "name": "chat history output",
+      "webhookId": "1f7650ee-78a6-4ae9-926c-fe024b4f83d8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileTypeData = $('File Type').all();\nconst items = $input.all();\n\nconst fileList = items.map((item, index) => {\n  const fileName = fileTypeData[index]?.json?.fileName || item.json.fileName || 'Unknown file';\n  return `- ${fileName}`;\n}).join('\\n');\n\nreturn [{\n  json: {\n    message: `##### Unsupported Files\\n\\n The following file(s) could not be processed:\\n${fileList}\\n\\n ###### Supported formats: PDF, TXT, CSV, XLS, XLSX, DOCX.\\n\\n----`\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -864,
+        2016
+      ],
+      "id": "3b122dff-8a15-4b19-a259-fd7f9836c199",
+      "name": "Unsupported_files_helper"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        2016
+      ],
+      "id": "f4ade8fd-0ac6-426c-8a25-939b4f9721b2",
+      "name": "output for unsupported files ",
+      "webhookId": "cc5d6b00-82f6-44fe-8723-91e1ad33e834"
+    },
+    {
+      "parameters": {
+        "message": "You requested a task that is not supported in this system. I can help you with files related tasks, the existing tasks:\n\n- Summarisation\n- Classification\n- Data Extraction",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.1,
+      "position": [
+        1584,
+        1504
+      ],
+      "id": "84552ec5-381c-48fa-8a05-3176f3cf3a76",
+      "name": "output for rejected tasks",
+      "webhookId": "eca95a7d-00c3-4d67-8250-93fc787841b5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        1600
+      ],
+      "typeVersion": 1,
+      "id": "09c50547-b83b-4b13-9672-8c18d64e838d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        1600
+      ],
+      "typeVersion": 1,
+      "id": "274e2ccc-1db0-4ca4-815a-e9b1fdffca22",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## User chat to interact with the system.\n\n#### - The system mainly for attaching files and requiring a task.\n#### - The user can attach files including pdf, txt, docx, csv, xls, and xlsx.\n#### - If the user asked something without attaching a file, the Chat agent will instruct the user the best way.\n\n## Tasks the system can preform:\n#### - Summarisation\n#### - Classification\n#### - Data Extraction\n ",
+        "height": 1152,
+        "width": 2288,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1936,
+        -608
+      ],
+      "typeVersion": 1,
+      "id": "59d513f8-ba3a-40da-93d2-132f9b39c971",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Summariser Agent\n\n#### This is a specialised agent in summarisation, summarise each file independently, or splitting the large files into smaller chunks\n#### with overlaps making the summarisation more accurate.\n\n#### The agent summarise the files in points to give the user a good overview for each file.",
+        "height": 1152,
+        "width": 1632,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        -608
+      ],
+      "typeVersion": 1,
+      "id": "dbd1e796-acac-4c0d-b372-c7cc42b72332",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Orchestrator Agent\n\n#### The orchestrator analyse the user message and decides which specialised agent to call.\n\n#### There are 3 specialised agents:\n##### - Summariser\n##### - Classifier\n##### - Data Extractor\n\n##### Otherwise, the orchestrator rejects the user's request and instruct the user about the existing tasks.",
+        "height": 1632,
+        "width": 1632,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "d21fef9d-da8a-4877-8387-08dcec15b19b",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Data Extractor Agent\n\n#### The data extraction agent, extracts from each file the key information, including:\n##### - Key parties (e.g. names, companies, shipping company)\n##### - Key numbers (e.g account number, order number)\n##### - Key dates (e.g. issue date, due date)\n##### - Main addresses (e.g. shipping address, return address, home address)\n##### - Billing breakdown (e.g. total amount, tax, unit price)\n##### - Item information (eg. item name, quantity, price)\n##### - Payment (e.g. amount paid, payment method)",
+        "height": 1632,
+        "width": 1680,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2016,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "b596fb45-3936-4ab8-9424-f49fbb8262c7",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Classifier Agent\n\n#### The agent classifies each file independently, giving an output of:\n##### - File name\n##### - File type\n##### - File category\n##### - One line of an overview of the file",
+        "height": 1152,
+        "width": 1680,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2016,
+        -608
+      ],
+      "typeVersion": 1,
+      "id": "f2d9ad78-f138-4a85-b619-cee5b15d0839",
+      "name": "Sticky Note8"
     }
   ],
   "connections": {
@@ -1087,7 +1307,7 @@
         ],
         [
           {
-            "node": "Orchestrator",
+            "node": "Chat History Agent",
             "type": "main",
             "index": 0
           }
@@ -1222,6 +1442,13 @@
         [
           {
             "node": "XLSX files loop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported_files_helper",
             "type": "main",
             "index": 0
           }
@@ -1373,7 +1600,7 @@
         ],
         [
           {
-            "node": "Chat5",
+            "node": "output for rejected tasks",
             "type": "main",
             "index": 0
           }
@@ -1664,6 +1891,50 @@
           }
         ]
       ]
+    },
+    "Chat history-LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Chat History Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat History Agent": {
+      "main": [
+        [
+          {
+            "node": "chat history output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "History Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Chat History Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsupported_files_helper": {
+      "main": [
+        [
+          {
+            "node": "output for unsupported files ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1678,9 +1949,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "af8fd31f-ab10-473e-a547-5689a508cce5",
+  "versionId": "56282283-4db6-4816-932f-196db98bde98",
   "activeVersionId": null,
-  "versionCounter": 992,
+  "versionCounter": 1472,
   "triggerCount": 1,
   "id": "7tPyu-w8qpUo3oeb-eGdx"
 }
