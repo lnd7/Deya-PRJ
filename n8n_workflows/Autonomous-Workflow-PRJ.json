@@ -6,13 +6,13 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "let binaryData = $input.first()?.binary;\nif (!binaryData) {\n  try {\n    binaryData = $('When chat message received').item.binary;\n  } catch (e) {\n    binaryData = null;\n  }\n}\n\nif (!binaryData || Object.keys(binaryData).length === 0) {\n  return [{ \n    json: { \n      text: \"No attached files found. Please try uploading again.\",\n      error: true\n    } \n  }];\n}\n\nconst SUPPORTED_TYPES = ['pdf', 'txt', 'csv', 'xls', 'xlsx'];\nconst results = [];\nconst rejected = [];\n\nfor (const key of Object.keys(binaryData)) {\n  const file = binaryData[key];\n  const fileName = (file.fileName || 'unknown');\n  const fileNameLower = fileName.toLowerCase();\n  const mimeType = file.mimeType || '';\n\n  let fileType = null;\n\n  // PDF\n  if (mimeType.includes('pdf') || fileNameLower.endsWith('.pdf')) {\n    fileType = 'pdf';\n  }\n  // Text\n  else if (\n    mimeType.includes('text/plain') ||\n    fileNameLower.endsWith('.txt') ||\n    fileNameLower.endsWith('.md') ||\n    fileNameLower.endsWith('.rtf')\n  ) {\n    fileType = 'txt';\n  }\n  // CSV\n  else if (\n    mimeType.includes('text/csv') ||\n    mimeType.includes('application/csv') ||\n    fileNameLower.endsWith('.csv')\n  ) {\n    fileType = 'csv';\n  }\n  // XLS\n  else if (\n    mimeType.includes('application/vnd.ms-excel') ||\n    fileNameLower.endsWith('.xls')\n  ) {\n    fileType = 'xls';\n  }\n  // XLSX\n  else if (\n    mimeType.includes('spreadsheetml') ||\n    mimeType.includes('openxmlformats') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    fileType = 'xlsx';\n  }\n  // \u2500\u2500 Unsupported \u2500\u2500\n  else {\n    rejected.push(fileName);\n    continue; // skip this file\n  }\n\n  results.push({\n    json: {\n      fileName: fileName,\n      mimeType: mimeType,\n      fileType: fileType\n    },\n    binary: {\n      data: file\n    }\n  });\n}\n\n//If ALL files rejected\nif (results.length === 0) {\n  return [{\n    json: {\n      error: true,\n      text: `Unsupported file type(s): ${rejected.join(', ')}. Supported formats are: PDF, TXT, CSV, XLS, XLSX.`\n    }\n  }];\n}\n\n// If some files rejected, log warning but continue\nif (rejected.length > 0) {\n  results[0].json.warning = `Skipped unsupported file(s): ${rejected.join(', ')}`;\n}\n\nreturn results;\n"
+        "jsCode": "let binaryData = $input.first()?.binary;\nif (!binaryData) {\n  try {\n    binaryData = $('When chat message received').item.binary;\n  } catch (e) {\n    binaryData = null;\n  }\n}\n\nif (!binaryData || Object.keys(binaryData).length === 0) {\n  return [{ \n    json: { \n      text: \"No attached files found. Please try uploading again.\",\n      error: true\n    } \n  }];\n}\n\nconst results = [];\nconst rejected = [];\n\nfor (const key of Object.keys(binaryData)) {\n  const file = binaryData[key];\n  const fileName = (file.fileName || 'unknown');\n  const fileNameLower = fileName.toLowerCase();\n  const mimeType = file.mimeType || '';\n\n  let fileType = null;\n\n  // PDF\n  if (mimeType.includes('pdf') || fileNameLower.endsWith('.pdf')) {\n    fileType = 'pdf';\n  }\n  \n  // TXT\n  else if (\n    mimeType.includes('text') ||\n    fileNameLower.endsWith('.txt') \n  ) {\n    fileType = 'txt';\n  }\n  \n  // DOCX\n  else if (\n    mimeType.includes('wordprocessingml') ||\n    fileNameLower.endsWith('.docx') \n  ) {\n    fileType = 'docx';\n  }\n\n  // CSV\n  else if (\n    mimeType.includes('csv') ||\n    fileNameLower.endsWith('.csv')\n  ) {\n    fileType = 'csv';\n  }\n\n  // XLS\n  else if (\n    mimeType.includes('vnd.ms-excel') ||\n    fileNameLower.endsWith('.xls')\n  ) {\n    fileType = 'xls';\n  }\n\n  // XLSX\n  else if (\n    mimeType.includes('spreadsheetml') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    fileType = 'xlsx';\n  }\n\n  // Unsupported Files\n  else {\n    results.push({\n      json: {\n        fileName: fileName,\n        mimeType: mimeType,\n        fileType: 'unsupported'\n      }\n    });\n  }\n\n  results.push({\n    json: {\n      fileName: fileName,\n      mimeType: mimeType,\n      fileType: fileType\n    },\n    binary: {\n      data: file\n    }\n  });\n}\n\nif (results.length === 0) {\n  return [{\n    json: {\n      error: true,\n      text: `Unsupported file type(s): ${rejected.join(', ')}. Supported formats are: PDF, TXT, CSV, XLS, XLSX, DOCX.`\n    }\n  }];\n}\n\nif (rejected.length > 0) {\n  results[0].json.warning = `Skipped unsupported file(s): ${rejected.join(', ')}`;\n}\n\nreturn results;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         -1488,
-        1136
+        1152
       ],
       "id": "a533467b-d007-4bff-b8db-2d8ed6b6846c",
       "name": "Document_Tool"
@@ -29,8 +29,8 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        -1552,
-        -448
+        -1808,
+        -224
       ],
       "id": "303b562c-825a-451e-8b59-3cf031019d3d",
       "name": "When chat message received",
@@ -45,8 +45,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -848,
-        544
+        -880,
+        624
       ],
       "id": "1489e677-f73f-474c-bcd1-ce92cb2f27ba",
       "name": "PDF_Extractor"
@@ -79,8 +79,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -816,
-        -448
+        -1072,
+        -224
       ],
       "id": "4c51a1ff-4b86-439e-bc1e-60a701ab075b",
       "name": "files_attached?"
@@ -92,8 +92,8 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        1024,
-        432
+        1168,
+        1392
       ],
       "id": "0d46b4b8-9424-42c5-af3d-c55af95a94a7",
       "name": "Structured Output Parser"
@@ -105,8 +105,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1232,
-        -448
+        -1488,
+        -224
       ],
       "id": "d94d413d-8fe9-4c43-b4ba-eb5c8750e308",
       "name": "Check Input"
@@ -121,8 +121,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        848,
-        240
+        992,
+        1200
       ],
       "id": "a997f61e-c2e4-4b3d-8d8d-694bf57b0075",
       "name": "Orchestrator",
@@ -137,8 +137,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        784,
-        432
+        928,
+        1392
       ],
       "id": "f4cf2ed3-a680-440a-a48e-182de0d42ef4",
       "name": "Orchestrator-LLM",
@@ -248,8 +248,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        1216,
-        208
+        1360,
+        1168
       ],
       "id": "c01431f6-d8d0-4267-ad5c-60d069967f40",
       "name": "Switch Task"
@@ -262,8 +262,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -848,
-        752
+        -880,
+        832
       ],
       "id": "1750990b-df30-4d66-bc77-c9e151209b5d",
       "name": "Text_Extractor"
@@ -275,8 +275,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -608,
-        1008
+        -672,
+        1200
       ],
       "id": "1555c6cc-da92-497a-ae9c-661af0c952f3",
       "name": "CSV_Extractor"
@@ -289,8 +289,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -608,
-        1296
+        -672,
+        1488
       ],
       "id": "6916645b-32df-472e-8615-067927257bf9",
       "name": "XLS_Extractor"
@@ -303,8 +303,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -640,
-        1568
+        -704,
+        1760
       ],
       "id": "87d7dd35-9326-4f6b-b906-45ea6aa236ca",
       "name": "XLSX_Extractor"
@@ -348,6 +348,29 @@
                     "id": "53fd4943-1564-48c1-99a1-2d88cffe6185",
                     "leftValue": "={{ $json.fileType }}",
                     "rightValue": "txt",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "05a92d3e-29bf-454c-a653-b7dbd874ade9",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "docx",
                     "operator": {
                       "type": "string",
                       "operation": "equals",
@@ -426,6 +449,29 @@
                 ],
                 "combinator": "and"
               }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "79407d95-c4bb-4d4d-9871-c04be1a1ddec",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "unsupported",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
             }
           ]
         },
@@ -447,8 +493,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        544
+        -464,
+        624
       ],
       "id": "5d757be5-90bf-4830-9437-102c9aa70999",
       "name": "pdf helper"
@@ -460,8 +506,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        1008
+        -464,
+        1200
       ],
       "id": "b57c3a9a-6901-421e-976c-4ae4271b5f9d",
       "name": "CSV helper"
@@ -473,8 +519,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        1296
+        -464,
+        1488
       ],
       "id": "2121c45a-8dee-4a27-bce8-8fefe0ecd286",
       "name": "XLS helper"
@@ -486,8 +532,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        752
+        -464,
+        832
       ],
       "id": "d17c7804-bd29-4c71-9b10-514f76d57ef4",
       "name": "Text helper"
@@ -499,8 +545,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        1568
+        -464,
+        1760
       ],
       "id": "5fdba658-d6fa-4de6-b2e5-5088a465c8a3",
       "name": "XLSX helper"
@@ -512,8 +558,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -848,
-        1552
+        -896,
+        1744
       ],
       "id": "9f3d29f1-fa48-4c59-8fdb-5fa5e69d6e04",
       "name": "XLSX files loop"
@@ -525,8 +571,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -848,
-        1280
+        -896,
+        1472
       ],
       "id": "99337519-586b-41e4-8ad0-bfc6f8ff75a3",
       "name": "XLS files loop"
@@ -538,8 +584,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -848,
-        992
+        -896,
+        1184
       ],
       "id": "6ce11f86-2185-45c1-a834-bdd667ab870b",
       "name": "CSV files loop"
@@ -559,65 +605,144 @@
     },
     {
       "parameters": {
-        "numberInputs": 5
+        "numberInputs": 6
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
         0,
-        992
+        976
       ],
       "id": "298d3484-db98-4784-9888-aa8282f726f8",
       "name": "Merge"
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "ff65aa27-3148-4eeb-82b5-3696b52906cc",
-              "leftValue": "={{ $('Check Input').item.json.has_file }}",
-              "rightValue": "",
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
+        "jsCode": "const helperItems = $('helper').all();\n\nconst TOKEN_LIMIT = 7000;\nconst CHARS_PER_TOKEN = 4;\nconst MAX_CHARS = Math.floor(TOKEN_LIMIT * CHARS_PER_TOKEN * 0.9);\nconst OVERLAP_CHARS = Math.floor(MAX_CHARS * 0.05); // 5% overlap\n\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const text = typeof item.json.fileContent === 'string'\n    ? item.json.fileContent\n    : JSON.stringify(item.json.fileContent || '');\n  const fileName = item.json.fileName || 'Unknown Document';\n  const estimatedTokens = Math.ceil(text.length / CHARS_PER_TOKEN);\n\n  if (!text.trim()) return;\n\n  // Small file, pass directly \n  if (estimatedTokens <= TOKEN_LIMIT) {\n    results.push({\n      json: {\n        filename: fileName,\n        content: text,\n        estimated_tokens: estimatedTokens,\n        is_split: false,\n        chunk_index: 1,\n        total_chunks: 1,\n        mode: 'direct'\n      }\n    });\n    return;\n  }\n\n  // Large file, split with overlap\n  const chunks = [];\n  let start = 0;\n\n  while (start < text.length) {\n    let end = start + MAX_CHARS;\n\n    if (end < text.length) {\n      const nearestSpace = text.lastIndexOf(' ', end);\n      if (nearestSpace > start) end = nearestSpace;\n    }\n\n    const chunkText = text.slice(start, end).trim();\n    if (chunkText.length > 0) chunks.push(chunkText);\n\n    start = end - OVERLAP_CHARS;\n\n    const nextSpace = text.indexOf(' ', start);\n    if (nextSpace !== -1 && nextSpace < end) start = nextSpace + 1;\n  }\n\n  const totalChunks = chunks.length;\n\n  chunks.forEach((chunkText, index) => {\n    const chunkIndex = index + 1;\n    results.push({\n      json: {\n        filename: fileName,\n        content: chunkText,\n        estimated_tokens: Math.ceil(chunkText.length / CHARS_PER_TOKEN),\n        is_split: true,\n        chunk_index: chunkIndex,\n        total_chunks: totalChunks,\n        mode: chunkIndex === totalChunks ? 'final' : 'partial'\n      }\n    });\n  });\n});\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        -32
+      ],
+      "id": "bb112df7-1e82-4ed1-b536-3063f2cc4bb0",
+      "name": "summariser helper"
+    },
+    {
+      "parameters": {
         "options": {}
       },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
       "position": [
-        2096,
-        -208
+        848,
+        -288
       ],
-      "id": "d2675240-45b0-4618-9209-b7c40cc65fe8",
-      "name": "files_in_message?"
+      "id": "b1fddd50-71de-4fcf-842d-7e1920e713b0",
+      "name": "summariser loop"
+    },
+    {
+      "parameters": {
+        "content": "## Extract the files\n\n#### This workflow extract from different file types, as following:\n\n##### - PDF\n##### - TXT\n##### - DOCX\n##### - CSV\n##### - XLS\n##### - XLSX",
+        "height": 1632,
+        "width": 2288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1936,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "6e55be46-3090-4474-9865-1f13bee9a406",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "const helperItems = $('helper').all();\n\nconst CHARS_PER_TOKEN = 4;\nconst PREVIEW_TOKENS = 1000;\nconst PREVIEW_CHARS = PREVIEW_TOKENS * CHARS_PER_TOKEN; // 4000 chars\nconst MAX_ROWS = 5;\n\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const fileName = item.json.fileName || 'Unknown Document';\n  const fileNameLower = fileName.toLowerCase();\n  const rawContent = item.json.fileContent;\n\n  let text = '';\n  let note = '';\n\n  // Data Set files\n  if (\n    fileNameLower.endsWith('.csv') ||\n    fileNameLower.endsWith('.xls') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    if (Array.isArray(rawContent)) {\n      const rows = rawContent.slice(0, MAX_ROWS);\n      if (rawContent.length > MAX_ROWS)\n        note = `[Preview: first ${MAX_ROWS} of ${rawContent.length} rows]`;\n      text = JSON.stringify(rows);\n    } else {\n      text = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent || '');\n    }\n  }\n  // PDF, TXT and DOCX files\n  else {\n    const full = typeof rawContent === 'string'\n      ? rawContent\n      : JSON.stringify(rawContent || '');\n\n    if (full.length > PREVIEW_CHARS) {\n      text = full.slice(0, PREVIEW_CHARS);\n      \n      const lastSpace = text.lastIndexOf(' ');\n      if (lastSpace > 0) text = text.slice(0, lastSpace);\n      note = `[Preview: first ${PREVIEW_TOKENS} tokens of document]`;\n    } else {\n      text = full;\n    }\n  }\n\n  if (!text.trim()) return;\n\n  if (note) text = `${note}\\n\\n${text}`;\n\n  results.push({\n    json: {\n      filename: fileName,\n      content: text,\n      estimated_tokens: Math.ceil(text.length / CHARS_PER_TOKEN),\n      mode: 'direct'\n    }\n  });\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        -80
+      ],
+      "id": "77fc6e22-baad-406a-8a04-e469fe57a48b",
+      "name": "classification helper"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2672,
+        -288
+      ],
+      "id": "b8c192e3-9a8d-4d9f-8991-a98074dc4466",
+      "name": "classification loop"
+    },
+    {
+      "parameters": {
+        "jsCode": "const helperItems = $('helper').all();\n\nconst TOKEN_LIMIT = 4000;\nconst CHARS_PER_TOKEN = 4;\nconst MAX_CHARS = Math.floor(TOKEN_LIMIT * CHARS_PER_TOKEN * 0.9);\nconst MAX_ROWS = 10;\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const fileName = item.json.fileName || 'Unknown Document';\n  const fileNameLower = fileName.toLowerCase();\n  const rawContent = item.json.fileContent;\n\n  let text = '';\n  let trimmed = false;\n\n  if (\n    fileNameLower.endsWith('.csv') ||\n    fileNameLower.endsWith('.xls') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    if (Array.isArray(rawContent)) {\n      const rows = rawContent.slice(0, MAX_ROWS);\n      trimmed = rawContent.length > MAX_ROWS;\n      text = JSON.stringify(rows);\n    } else {\n      text = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent || '');\n    }\n  } else {\n    text = typeof rawContent === 'string'\n      ? rawContent\n      : JSON.stringify(rawContent || '');\n  }\n\n  if (!text.trim()) return;\n\n  if (trimmed) {\n    text = `[Note: File contains more than ${MAX_ROWS} rows. Showing first ${MAX_ROWS} rows only.]\\n\\n${text}`;\n  }\n\n  const estimatedTokens = Math.ceil(text.length / CHARS_PER_TOKEN);\n\n  if (estimatedTokens <= TOKEN_LIMIT) {\n    results.push({\n      json: {\n        filename: fileName,\n        content: text,\n        estimated_tokens: estimatedTokens,\n        is_split: false,\n        chunk_index: 1,\n        total_chunks: 1,\n        mode: 'direct',\n        was_trimmed: trimmed\n      }\n    });\n    return;\n  }\n\n  const chunks = [];\n  let start = 0;\n\n  while (start < text.length) {\n    let end = start + MAX_CHARS;\n    if (end < text.length) {\n      const nearestSpace = text.lastIndexOf(' ', end);\n      if (nearestSpace > start) end = nearestSpace;\n    }\n    const chunkText = text.slice(start, end).trim();\n    if (chunkText.length > 0) chunks.push(chunkText);\n    start = end + 1;\n  }\n\n  const totalChunks = chunks.length;\n  chunks.forEach((chunkText, index) => {\n    const chunkIndex = index + 1;\n    results.push({\n      json: {\n        filename: fileName,\n        content: chunkText,\n        estimated_tokens: Math.ceil(chunkText.length / CHARS_PER_TOKEN),\n        is_split: true,\n        chunk_index: chunkIndex,\n        total_chunks: totalChunks,\n        mode: chunkIndex === totalChunks ? 'final' : 'partial',\n        was_trimmed: trimmed\n      }\n    });\n  });\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        1200
+      ],
+      "id": "82f45010-3e3b-48eb-8918-89138f5c8780",
+      "name": "data extraction helper"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2752,
+        1200
+      ],
+      "id": "9926b190-4ff6-45e4-89a5-0e76c47ee64a",
+      "name": "data extraction loop"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=You are a summarization agent.\nYour job is to summarize the document content provided to you.\n\n## Input Fields\nYou will receive:\n- filename: {{ $json.filename }}\n- content (the text to summarize): {{ $json.content }}\n- mode: tells you what part of the document this is ({{ $json.mode }})\n- chunk_index: which part this is ({{ $json.chunk_index }})\n- total_chunks: how many parts total ({{ $json.total_chunks }})\n\n## Rules Based on Mode\n\nIf {{ $json.mode }} = \"direct\":\n- You have the COMPLETE document\n- Provide a full final summary\n- Short doc  \u2192 one paragraph\n- Medium doc \u2192 3-5 bullet points\n- Long doc   \u2192 overview + key points + conclusion\n\nIf {{ $json.mode }} = \"partial\":\n- You have chunk {{ $json.chunk_index }} of {{ $json.total_chunks }}\n- Summarize ONLY what is in this chunk\n- Do NOT conclude \u2014 more parts follow\n- End with: \"[Part {{ $json.chunk_index }} of {{ $json.total_chunks }} summarized]\"\n\nIf {{ $json.mode }} = \"final\":\n- You have the LAST chunk of {{ $json.total_chunks }} parts\n- Summarize this chunk\n- Then write a final conclusion for the whole document\n- End with: \"[End of document]\"\n\n## Rules\n- Never fabricate content not present in the document\n- Never refer to \"chunk\" or \"part\" in your summary output \u2014 write naturally\n- Always start your response with the filename: \"## {{ $json.filename }}\"\n- If content appears incomplete or cut off, note it briefly ",
+        "text": "=You are a summarisation agent.\nYour job is to summarise the document content provided to you.\n\n## Input Fields\nYou will receive:\n- filename: {{ $json.filename }}\n- content (the text to summarise): {{ $json.content }}\n- mode: tells you what part of the document this is ({{ $json.mode }})\n- chunk_index: which part this is ({{ $json.chunk_index }})\n- total_chunks: how many parts total ({{ $json.total_chunks }})\n\n## Rules Based on Mode\n\nIf {{ $json.mode }} = \"direct\":\n- You have the COMPLETE document\n- Provide a full final summary\n- Short doc  => one paragraph\n- Medium doc => 3-5 bullet points\n- Long doc   => overview + key points + conclusion\n\nIf {{ $json.mode }} = \"partial\":\n- You have chunk {{ $json.chunk_index }} of {{ $json.total_chunks }}\n- Summarize ONLY what is in this chunk\n- Do NOT conclude, more parts follow\n- End with: \"[Part {{ $json.chunk_index }} of {{ $json.total_chunks }} summarised]\"\n\nIf {{ $json.mode }} = \"final\":\n- You have the LAST chunk of {{ $json.total_chunks }} parts\n- Summarise this chunk\n- Then write a final conclusion for the whole document\n- End with: \"[End of document]\"\n\n## Rules\n- Never fabricate content not present in the document\n- Never refer to \"chunk\" or \"part\" in your summary output \u2014 write naturally\n- Always start your response with the filename: \"## {{ $json.filename }}\"\n- If content appears incomplete or cut off, note it briefly ",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2544,
-        -496
+        864,
+        -64
       ],
       "id": "48dc58aa-888b-44dd-8a73-0b30f06430b9",
-      "name": "AI Agent"
+      "name": "Summariser Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        864,
+        128
+      ],
+      "id": "3a222dc3-4b16-4384-880b-8193e3a9bd5a",
+      "name": "summariser-LLM",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2",
+          "name": "Google Gemini"
+        }
+      }
     },
     {
       "parameters": {
@@ -626,31 +751,12 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3024,
-        -576
+        1200,
+        -64
       ],
       "id": "053c2718-f36d-48fc-ac3e-6f50190f7871",
-      "name": "Wait1",
+      "name": "Wait",
       "webhookId": "fc7ed66d-79fc-47aa-b049-1394c7313348"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
-      "position": [
-        2544,
-        -304
-      ],
-      "id": "3a222dc3-4b16-4384-880b-8193e3a9bd5a",
-      "name": "Google Gemini Chat Model",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "2",
-          "name": "Google Gemini"
-        }
-      }
     },
     {
       "parameters": {
@@ -669,11 +775,24 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2832,
-        -736
+        1152,
+        -304
       ],
       "id": "7fb6cca3-6e71-445d-8f9b-4762d8706898",
-      "name": "Edit Fields1"
+      "name": "summeriser edit field"
+    },
+    {
+      "parameters": {
+        "jsCode": "const summaries = items.map((item, index) => {\n  const text = item.json.output?.text || item.json.text || item.json.output;\n  return `${text}`;\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: summaries } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        -304
+      ],
+      "id": "195291e8-1a3c-42c4-8ab6-d96ccaba09a6",
+      "name": "summeriser parser"
     },
     {
       "parameters": {
@@ -683,147 +802,12 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        3632,
-        -752
+        1664,
+        -304
       ],
       "id": "a5d8fd6b-70cb-45d2-ab76-a856c350430f",
-      "name": "Chat2",
+      "name": "summeriser output",
       "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
-    },
-    {
-      "parameters": {
-        "jsCode": "const summaries = items.map((item, index) => {\n  const text = item.json.output?.text || item.json.text || item.json.output;\n  return `${text}`;\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: summaries } }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3280,
-        -752
-      ],
-      "id": "195291e8-1a3c-42c4-8ab6-d96ccaba09a6",
-      "name": "Code in JavaScript6"
-    },
-    {
-      "parameters": {
-        "message": "Please attach the files you want to summarise.",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.chat",
-      "typeVersion": 1.1,
-      "position": [
-        2480,
-        -48
-      ],
-      "id": "f5488e59-229b-452a-9228-174ef822c4c1",
-      "name": "Chat1",
-      "webhookId": "0814425b-b2bd-43da-8736-dc1bcbf6fca6"
-    },
-    {
-      "parameters": {
-        "jsCode": "const helperItems = $('helper').all();\n\nconst TOKEN_LIMIT = 7000;\nconst CHARS_PER_TOKEN = 4;\nconst MAX_CHARS = Math.floor(TOKEN_LIMIT * CHARS_PER_TOKEN * 0.9);\n\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const text = typeof item.json.fileContent === 'string'\n    ? item.json.fileContent\n    : JSON.stringify(item.json.fileContent || '');\n  const fileName = item.json.fileName || 'Unknown Document';\n  const estimatedTokens = Math.ceil(text.length / CHARS_PER_TOKEN);\n\n  if (!text.trim()) return;\n\n  // Small files unchanged\n  if (estimatedTokens <= TOKEN_LIMIT) {\n    results.push({\n      json: {\n        filename: fileName,\n        content: text,\n        estimated_tokens: estimatedTokens,\n        is_split: false,\n        chunk_index: 1,\n        total_chunks: 1,\n        mode: 'direct'\n      }\n    });\n    return;\n  }\n\n  // Split large files\n  const chunks = [];\n  let start = 0;\n\n  while (start < text.length) {\n    let end = start + MAX_CHARS;\n\n    if (end < text.length) {\n      const nearestSpace = text.lastIndexOf(' ', end);\n      if (nearestSpace > start) end = nearestSpace;\n    }\n\n    const chunkText = text.slice(start, end).trim();\n    if (chunkText.length > 0) chunks.push(chunkText);\n    start = end + 1;\n  }\n\n  const totalChunks = chunks.length;\n\n  chunks.forEach((chunkText, index) => {\n    const chunkIndex = index + 1;\n    results.push({\n      json: {\n        filename: fileName,\n        content: chunkText,\n        estimated_tokens: Math.ceil(chunkText.length / CHARS_PER_TOKEN),\n        is_split: true,\n        chunk_index: chunkIndex,\n        total_chunks: totalChunks,\n        mode: chunkIndex === totalChunks ? 'final' : 'partial'\n      }\n    });\n  });\n});\n\nreturn results;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2256,
-        -464
-      ],
-      "id": "bb112df7-1e82-4ed1-b536-3063f2cc4bb0",
-      "name": "summariser helper"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "c00b5b8d-299f-48b6-90d7-4d3eb54c000d",
-              "leftValue": "={{ $('summariser loop').item.json.estimated_tokens }}",
-              "rightValue": 3500,
-              "operator": {
-                "type": "number",
-                "operation": "gte"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        2816,
-        -512
-      ],
-      "id": "084e8996-197b-4ea8-b244-9ea96c12250a",
-      "name": "If"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [
-        2512,
-        -720
-      ],
-      "id": "b1fddd50-71de-4fcf-842d-7e1920e713b0",
-      "name": "summariser loop"
-    },
-    {
-      "parameters": {
-        "amount": 6
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        3024,
-        -432
-      ],
-      "id": "ae93dcd6-24a8-4d19-88b6-363d3c23ce9c",
-      "name": "Wait",
-      "webhookId": "3d2010ab-632a-4644-b086-3962032673a8"
-    },
-    {
-      "parameters": {
-        "contextWindowLength": 50
-      },
-      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
-      "typeVersion": 1.3,
-      "position": [
-        2704,
-        -272
-      ],
-      "id": "9786e36e-2f7a-425e-939b-3c2fab524ca5",
-      "name": "Postgres Chat Memory",
-      "credentials": {
-        "postgres": {
-          "id": "1",
-          "name": "Postgres (RAG DB)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "content": "## Extract the files\n\nThis workflow extract from different file types, \nas following:\n\n- PDF\n- TXT\n- CSV\n- XLS\n- XLSX",
-        "height": 1280,
-        "width": 2288
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        -1920,
-        512
-      ],
-      "typeVersion": 1,
-      "id": "6e55be46-3090-4474-9865-1f13bee9a406",
-      "name": "Sticky Note"
     },
     {
       "parameters": {
@@ -838,7 +822,7 @@
         432
       ],
       "id": "d392eb8e-92d6-4898-9dab-7cf5ce9f3994",
-      "name": "AI Agent1"
+      "name": "Classifier Agent"
     },
     {
       "parameters": {
@@ -848,15 +832,51 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        2752,
-        672
+        2656,
+        112
       ],
       "id": "d7474e08-e55d-4f62-ba6f-81d52f47b89e",
-      "name": "Google Gemini Chat Model1",
+      "name": "classifier-LLM",
       "credentials": {
         "googlePalmApi": {
           "id": "2",
           "name": "Google Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1024,
+        160
+      ],
+      "id": "9786e36e-2f7a-425e-939b-3c2fab524ca5",
+      "name": "summariser chat memory",
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres (RAG DB)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2816,
+        96
+      ],
+      "id": "3e99d85f-faea-4e56-be4b-2171b63e5cf7",
+      "name": "classifier chat memory",
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres (RAG DB)"
         }
       }
     },
@@ -877,11 +897,24 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        3040,
-        160
+        2992,
+        -304
       ],
       "id": "bcb9847b-15f0-4fa5-9ea1-47642697d2d9",
-      "name": "Edit Fields"
+      "name": "classifier edit field"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    return `## ${data.filename} \\n ###### **Type:** ${data.document_type} \\n ###### **Category:** ${data.category} \\n ###### **Info:** ${data.info}`;\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3232,
+        -304
+      ],
+      "id": "27fe7908-f9ba-49d9-b75c-5f497969d646",
+      "name": "classifier parser"
     },
     {
       "parameters": {
@@ -891,40 +924,12 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        3424,
-        160
+        3472,
+        -304
       ],
       "id": "c583396b-27a3-4051-85b1-d721265fd287",
-      "name": "Chat",
+      "name": "classifier output",
       "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
-    },
-    {
-      "parameters": {
-        "jsCode": "const items = $input.all();\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    return `## ${data.filename} \\n ###### **Type:** ${data.document_type} \\n ###### **Category:** ${data.category} \\n ###### **Info:** ${data.info}`;\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3248,
-        160
-      ],
-      "id": "27fe7908-f9ba-49d9-b75c-5f497969d646",
-      "name": "Code in JavaScript"
-    },
-    {
-      "parameters": {
-        "message": "Please attach the files you want to classify.",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.chat",
-      "typeVersion": 1.1,
-      "position": [
-        2368,
-        752
-      ],
-      "id": "d9139a61-be33-4a1f-af87-9ea28cf77b54",
-      "name": "Chat3",
-      "webhookId": "0814425b-b2bd-43da-8736-dc1bcbf6fca6"
     },
     {
       "parameters": {
@@ -933,11 +938,11 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        2912,
-        624
+        2832,
+        1712
       ],
-      "id": "3e99d85f-faea-4e56-be4b-2171b63e5cf7",
-      "name": "Postgres Chat Memory1",
+      "id": "22f6e04a-31fd-40ab-b053-08a5d01a6e4e",
+      "name": "data extraction chat memory",
       "credentials": {
         "postgres": {
           "id": "1",
@@ -947,67 +952,158 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "ff65aa27-3148-4eeb-82b5-3696b52906cc",
-              "leftValue": "={{ $('Check Input').first().json.has_file }}",
-              "rightValue": "",
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
+        "modelName": "models/gemini-2.5-flash-lite",
         "options": {}
       },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
       "position": [
-        2000,
-        608
+        2704,
+        1680
       ],
-      "id": "38c30ace-a379-4d39-8ed9-7c1221e49f73",
-      "name": "classification_files_in_message?"
+      "id": "75286067-069d-4ef2-ace0-13f8bafa2cfd",
+      "name": "data extraction-LLM",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2",
+          "name": "Google Gemini"
+        }
+      }
     },
     {
       "parameters": {
-        "jsCode": "const helperItems = $('helper').all();\n\nconst TOKEN_LIMIT = 7000;\nconst CHARS_PER_TOKEN = 4;\nconst MAX_CHARS = Math.floor(TOKEN_LIMIT * CHARS_PER_TOKEN * 0.9);\n\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const text = typeof item.json.fileContent === 'string'\n    ? item.json.fileContent\n    : JSON.stringify(item.json.fileContent || '');\n  const fileName = item.json.fileName || 'Unknown Document';\n  const estimatedTokens = Math.ceil(text.length / CHARS_PER_TOKEN);\n\n  if (!text.trim()) return;\n\n  // Small files unchanged\n  if (estimatedTokens <= TOKEN_LIMIT) {\n    results.push({\n      json: {\n        filename: fileName,\n        content: text,\n        estimated_tokens: estimatedTokens,\n        is_split: false,\n        chunk_index: 1,\n        total_chunks: 1,\n        mode: 'direct'\n      }\n    });\n    return;\n  }\n\n  // Split large files\n  const chunks = [];\n  let start = 0;\n\n  while (start < text.length) {\n    let end = start + MAX_CHARS;\n\n    if (end < text.length) {\n      const nearestSpace = text.lastIndexOf(' ', end);\n      if (nearestSpace > start) end = nearestSpace;\n    }\n\n    const chunkText = text.slice(start, end).trim();\n    if (chunkText.length > 0) chunks.push(chunkText);\n    start = end + 1;\n  }\n\n  const totalChunks = chunks.length;\n\n  chunks.forEach((chunkText, index) => {\n    const chunkIndex = index + 1;\n    results.push({\n      json: {\n        filename: fileName,\n        content: chunkText,\n        estimated_tokens: Math.ceil(chunkText.length / CHARS_PER_TOKEN),\n        is_split: true,\n        chunk_index: chunkIndex,\n        total_chunks: totalChunks,\n        mode: chunkIndex === totalChunks ? 'final' : 'partial'\n      }\n    });\n  });\n});\n\nreturn results;"
+        "promptType": "define",
+        "text": "=You are a data extraction agent.\nYour job is to extract key structured information from documents such as bills, invoices, receipts, contracts, and financial documents.\n\n## Document\nFilename: {{ $json.filename }}\nContent: {{ $json.content }}\n\n## Output\nReturn this JSON only, no other text:\n\n{\n  \"filename\": \"{{ $json.filename }}\",\n  \"document_type\": \"<Invoice | Bill | Reciept | Unknown>\",\n  \"extracted_data\": {\n    \"dates\": {},\n    \"reference_numbers\": {},\n    \"parties\": {},\n    \"financials\": {},\n    \"line_items\": [],\n    \"payment_details\": {}\n  },\n  \"notes\": \"<anything unusual, missing, or unsupported>\"\n}\n\n\n## Rules\n- If document is a dataset or unsupported type, return document_type as Otherwise and explain in notes\n- Extract ONLY what is explicitly present, never fabricate\n- Missing fields should be null\n- Preserve original values exactly as they appear",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2704,
+        1456
+      ],
+      "id": "53982e06-e3c6-4369-8fc0-380449c5f11a",
+      "name": "Data Extractor Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be56ba83-444f-42ef-bdd0-9bd0a02191e2",
+              "name": "output.text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3056,
+        1184
+      ],
+      "id": "19696ae8-32c2-4a24-b78f-7f816c1755c9",
+      "name": "data extractor edit field"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst cleanKey = (key) => key.replace(/_/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());\n\nconst formatSection = (obj) =>\n  Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** ${v}`)\n    .join('\\n');\n\nconst formatFinancials = (obj) => {\n  return Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** &nbsp;&nbsp; ${v}`)\n    .join('\\n');\n};\n\nconst formatLineItems = (lineItems, currency = '') => {\n  const c = currency || '';\n  return lineItems.map((item, i) => {\n    const desc = item.description || 'Item';\n    const code = item.product_code ? ` *(${item.product_code})*` : '';\n    const qty = item.quantity || '-';\n    const price = item.unit_price ? `${c}${item.unit_price}` : '-';\n    const total = item.line_total ? `${c}${item.line_total}` : '-';\n    return `**${i + 1}. ${desc}**${code}\\n- Qty: ${qty} \u00d7 ${price} = **${total}**`;\n  }).join('\\n\\n');\n};\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    const d = data.extracted_data || {};\n\n    let output = `## ${data.filename}\\n###### Type: ${data.document_type}\\n\\n`;\n\n    if (d.parties && Object.values(d.parties).some(v => v))\n      output += `**Parties:**\\n${formatSection(d.parties)}\\n\\n`;\n\n    if (d.dates && Object.values(d.dates).some(v => v))\n      output += `**Dates:**\\n${formatSection(d.dates)}\\n\\n`;\n\n    if (d.reference_numbers && Object.values(d.reference_numbers).some(v => v))\n      output += `**Reference Numbers:**\\n${formatSection(d.reference_numbers)}\\n\\n`;\n\n    const currency = d.financials \n  ? (Object.entries(d.financials).find(([k]) => k === 'currency')?.[1] || '')\n  : '';\n\n  if (d.financials && Object.values(d.financials).some(v => v))\n  output += `**Financials:**\\n${formatFinancials(d.financials)}\\n\\n`;\n\n  if (d.line_items && d.line_items.length)\n  output += `**Line Items:**\\n\\n${formatLineItems(d.line_items, currency)}\\n\\n`;\n\n    if (d.payment_details && Object.values(d.payment_details).some(v => v))\n      output += `**Payment Details:**\\n${formatSection(d.payment_details)}\\n\\n`;\n\n    if (data.notes)\n      output += `**Notes:** ${data.notes}`;\n\n    return output;\n\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2464,
-        432
+        3280,
+        1184
       ],
-      "id": "77fc6e22-baad-406a-8a04-e469fe57a48b",
-      "name": "classification helper"
+      "id": "75a3e61a-d8e7-41f6-8145-454a92855845",
+      "name": "data extractor parser"
     },
     {
       "parameters": {
+        "message": "={{ $json.message }}",
         "options": {}
       },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.1,
       "position": [
-        2768,
-        272
+        3488,
+        1184
       ],
-      "id": "b8c192e3-9a8d-4d9f-8991-a98074dc4466",
-      "name": "classification loop"
+      "id": "d5fb20d8-b706-4e03-8709-87279a43f202",
+      "name": "data extractor output",
+      "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
     },
     {
       "parameters": {
-        "message": "This task is to be completed SOON.",
+        "jsCode": "const mammoth = require('mammoth');\n\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const binary = item.binary || {};\n  const binaryKey = Object.keys(binary)[0];\n\n  if (!binaryKey) continue;\n\n  const fileName = binary[binaryKey]?.fileName || 'Unknown.docx';\n  const buffer = await this.helpers.getBinaryDataBuffer(\n    items.indexOf(item), \n    binaryKey\n  );\n\n  try {\n    const result = await mammoth.extractRawText({ buffer });\n\n    results.push({\n      json: {\n        fileName: fileName,\n        fileContent: result.value\n      },\n      binary: {\n        data: binary[binaryKey]\n      }\n    });\n  } catch (err) {\n    results.push({\n      json: {\n        fileName: fileName,\n        fileContent: '',\n        error: err.message\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -672,
+        1008
+      ],
+      "id": "c733bbc2-fa5f-4252-9677-dbcc51443ed8",
+      "name": "DOCX_Extractor_Code"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        16
+      ],
+      "id": "7247f1cd-0545-4bcc-b320-097b68e6a6f5",
+      "name": "Chat history-LLM",
+      "credentials": {
+        "groqApi": {
+          "id": "3",
+          "name": "Groq"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User message: {{ $('When chat message received').first().json.chatInput }}\n\nYou are a helpful agent that answers questions based on the chat history.\n\nYou must be precise and concise, never answer the questions based on something other than chat memory, therefore apologise if you can't find anything related.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -560,
+        -208
+      ],
+      "id": "5cde93a8-237e-4a7f-ba8b-8dab2f185fd1",
+      "name": "Chat History Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        0
+      ],
+      "id": "3b219806-8b2a-4283-bf47-0599d0334cb8",
+      "name": "History Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres (RAG DB)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output }}",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chat",
@@ -1197,7 +1293,7 @@
         ],
         [
           {
-            "node": "Orchestrator",
+            "node": "Chat History Agent",
             "type": "main",
             "index": 0
           }
@@ -1310,6 +1406,13 @@
         ],
         [
           {
+            "node": "DOCX_Extractor_Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "CSV files loop",
             "type": "main",
             "index": 0
@@ -1325,6 +1428,13 @@
         [
           {
             "node": "XLSX files loop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported_files_helper",
             "type": "main",
             "index": 0
           }
@@ -1370,7 +1480,7 @@
           {
             "node": "Merge",
             "type": "main",
-            "index": 4
+            "index": 5
           }
         ],
         [
@@ -1388,7 +1498,7 @@
           {
             "node": "Merge",
             "type": "main",
-            "index": 3
+            "index": 4
           }
         ],
         [
@@ -1406,7 +1516,7 @@
           {
             "node": "Merge",
             "type": "main",
-            "index": 2
+            "index": 3
           }
         ],
         [
@@ -1455,14 +1565,14 @@
       "main": [
         [
           {
-            "node": "files_in_message?",
+            "node": "summariser helper",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "classification_files_in_message?",
+            "node": "classification helper",
             "type": "main",
             "index": 0
           }
@@ -1476,7 +1586,7 @@
         ],
         [
           {
-            "node": "Chat5",
+            "node": "output for rejected tasks",
             "type": "main",
             "index": 0
           }
@@ -1494,79 +1604,6 @@
         ]
       ]
     },
-    "files_in_message?": {
-      "main": [
-        [
-          {
-            "node": "summariser helper",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Chat1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Agent": {
-      "main": [
-        [
-          {
-            "node": "If",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait1": {
-      "main": [
-        [
-          {
-            "node": "summariser loop",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Gemini Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields1": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript6",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript6": {
-      "main": [
-        [
-          {
-            "node": "Chat2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "summariser helper": {
       "main": [
         [
@@ -1578,131 +1615,18 @@
         ]
       ]
     },
-    "If": {
-      "main": [
-        [
-          {
-            "node": "Wait1",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Wait",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "summariser loop": {
       "main": [
         [
           {
-            "node": "Edit Fields1",
+            "node": "summeriser edit field",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait": {
-      "main": [
-        [
-          {
-            "node": "summariser loop",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Postgres Chat Memory": {
-      "ai_memory": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_memory",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Agent1": {
-      "main": [
-        [
-          {
-            "node": "classification loop",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Gemini Chat Model1": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent1",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript": {
-      "main": [
-        [
-          {
-            "node": "Chat",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Postgres Chat Memory1": {
-      "ai_memory": [
-        [
-          {
-            "node": "AI Agent1",
-            "type": "ai_memory",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "classification_files_in_message?": {
-      "main": [
-        [
-          {
-            "node": "classification helper",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Chat3",
+            "node": "Summariser Agent",
             "type": "main",
             "index": 0
           }
@@ -1724,14 +1648,274 @@
       "main": [
         [
           {
-            "node": "Edit Fields",
+            "node": "classifier edit field",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "AI Agent1",
+            "node": "Classifier Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data extraction helper": {
+      "main": [
+        [
+          {
+            "node": "data extraction loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data extraction loop": {
+      "main": [
+        [
+          {
+            "node": "data extractor edit field",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Data Extractor Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summariser Agent": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summariser-LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summariser Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "summariser loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summeriser edit field": {
+      "main": [
+        [
+          {
+            "node": "summeriser parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summeriser parser": {
+      "main": [
+        [
+          {
+            "node": "summeriser output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classifier Agent": {
+      "main": [
+        [
+          {
+            "node": "classification loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classifier-LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Classifier Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summariser chat memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Summariser Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classifier chat memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Classifier Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classifier edit field": {
+      "main": [
+        [
+          {
+            "node": "classifier parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classifier parser": {
+      "main": [
+        [
+          {
+            "node": "classifier output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data extraction chat memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Data Extractor Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data extraction-LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Data Extractor Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Extractor Agent": {
+      "main": [
+        [
+          {
+            "node": "data extraction loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data extractor edit field": {
+      "main": [
+        [
+          {
+            "node": "data extractor parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data extractor parser": {
+      "main": [
+        [
+          {
+            "node": "data extractor output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DOCX_Extractor_Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Chat history-LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Chat History Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat History Agent": {
+      "main": [
+        [
+          {
+            "node": "chat history output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "History Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Chat History Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsupported_files_helper": {
+      "main": [
+        [
+          {
+            "node": "output for unsupported files ",
             "type": "main",
             "index": 0
           }

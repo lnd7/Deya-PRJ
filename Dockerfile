@@ -6,6 +6,7 @@ USER root
 
 # Copy default workflow files into the image
 # COPY ./n8n_workflows /workflows
+RUN npm install -g mammoth
 
 USER node
 
