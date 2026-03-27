@@ -815,8 +815,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2688,
-        -128
+        2784,
+        432
       ],
       "id": "d392eb8e-92d6-4898-9dab-7cf5ce9f3994",
       "name": "Classifier Agent"
@@ -1106,25 +1106,35 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        -144,
-        -208
+        1280,
+        1248
       ],
-      "id": "f6d6bd3d-cfd6-430c-9a14-83d378620ae9",
-      "name": "chat history output",
-      "webhookId": "1f7650ee-78a6-4ae9-926c-fe024b4f83d8"
+      "id": "84552ec5-381c-48fa-8a05-3176f3cf3a76",
+      "name": "Chat5",
+      "webhookId": "eca95a7d-00c3-4d67-8250-93fc787841b5"
     },
     {
       "parameters": {
-        "jsCode": "const fileTypeData = $('File Type').all();\nconst items = $input.all();\n\nconst fileList = items.map((item, index) => {\n  const fileName = fileTypeData[index]?.json?.fileName || item.json.fileName || 'Unknown file';\n  return `- ${fileName}`;\n}).join('\\n');\n\nreturn [{\n  json: {\n    message: `##### Unsupported Files\\n\\n The following file(s) could not be processed:\\n${fileList}\\n\\n ###### Supported formats: PDF, TXT, CSV, XLS, XLSX, DOCX.\\n\\n----`\n  }\n}];\n"
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be56ba83-444f-42ef-bdd0-9bd0a02191e2",
+              "name": "output.text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
       },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
-        -864,
-        2016
+        2688,
+        1280
       ],
-      "id": "3b122dff-8a15-4b19-a259-fd7f9836c199",
-      "name": "Unsupported_files_helper"
+      "id": "19696ae8-32c2-4a24-b78f-7f816c1755c9",
+      "name": "Edit Fields2"
     },
     {
       "parameters": {
@@ -1134,129 +1144,105 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        -480,
-        2016
+        3072,
+        1280
       ],
-      "id": "f4ade8fd-0ac6-426c-8a25-939b4f9721b2",
-      "name": "output for unsupported files ",
-      "webhookId": "cc5d6b00-82f6-44fe-8723-91e1ad33e834"
+      "id": "d5fb20d8-b706-4e03-8709-87279a43f202",
+      "name": "Chat4",
+      "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
     },
     {
       "parameters": {
-        "message": "You requested a task that is not supported in this system. I can help you with files related tasks, the existing tasks:\n\n- Summarisation\n- Classification\n- Data Extraction",
+        "jsCode": "const helperItems = $('helper').all();\n\nconst TOKEN_LIMIT = 4000;\nconst CHARS_PER_TOKEN = 4;\nconst MAX_CHARS = Math.floor(TOKEN_LIMIT * CHARS_PER_TOKEN * 0.9);\nconst MAX_ROWS = 10;\nconst results = [];\n\nhelperItems.forEach((item) => {\n  const fileName = item.json.fileName || 'Unknown Document';\n  const fileNameLower = fileName.toLowerCase();\n  const rawContent = item.json.fileContent;\n\n  let text = '';\n  let trimmed = false;\n\n  if (\n    fileNameLower.endsWith('.csv') ||\n    fileNameLower.endsWith('.xls') ||\n    fileNameLower.endsWith('.xlsx')\n  ) {\n    if (Array.isArray(rawContent)) {\n      const rows = rawContent.slice(0, MAX_ROWS);\n      trimmed = rawContent.length > MAX_ROWS;\n      text = JSON.stringify(rows);\n    } else {\n      text = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent || '');\n    }\n  } else {\n    text = typeof rawContent === 'string'\n      ? rawContent\n      : JSON.stringify(rawContent || '');\n  }\n\n  if (!text.trim()) return;\n\n  if (trimmed) {\n    text = `[Note: File contains more than ${MAX_ROWS} rows. Showing first ${MAX_ROWS} rows only.]\\n\\n${text}`;\n  }\n\n  const estimatedTokens = Math.ceil(text.length / CHARS_PER_TOKEN);\n\n  if (estimatedTokens <= TOKEN_LIMIT) {\n    results.push({\n      json: {\n        filename: fileName,\n        content: text,\n        estimated_tokens: estimatedTokens,\n        is_split: false,\n        chunk_index: 1,\n        total_chunks: 1,\n        mode: 'direct',\n        was_trimmed: trimmed\n      }\n    });\n    return;\n  }\n\n  const chunks = [];\n  let start = 0;\n\n  while (start < text.length) {\n    let end = start + MAX_CHARS;\n    if (end < text.length) {\n      const nearestSpace = text.lastIndexOf(' ', end);\n      if (nearestSpace > start) end = nearestSpace;\n    }\n    const chunkText = text.slice(start, end).trim();\n    if (chunkText.length > 0) chunks.push(chunkText);\n    start = end + 1;\n  }\n\n  const totalChunks = chunks.length;\n  chunks.forEach((chunkText, index) => {\n    const chunkIndex = index + 1;\n    results.push({\n      json: {\n        filename: fileName,\n        content: chunkText,\n        estimated_tokens: Math.ceil(chunkText.length / CHARS_PER_TOKEN),\n        is_split: true,\n        chunk_index: chunkIndex,\n        total_chunks: totalChunks,\n        mode: chunkIndex === totalChunks ? 'final' : 'partial',\n        was_trimmed: trimmed\n      }\n    });\n  });\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        1296
+      ],
+      "id": "82f45010-3e3b-48eb-8918-89138f5c8780",
+      "name": "data extraction helper"
+    },
+    {
+      "parameters": {
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.chat",
-      "typeVersion": 1.1,
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
       "position": [
-        1584,
-        1504
+        2352,
+        1296
       ],
-      "id": "84552ec5-381c-48fa-8a05-3176f3cf3a76",
-      "name": "output for rejected tasks",
-      "webhookId": "eca95a7d-00c3-4d67-8250-93fc787841b5"
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        -432,
-        1600
-      ],
-      "typeVersion": 1,
-      "id": "09c50547-b83b-4b13-9672-8c18d64e838d",
-      "name": "Sticky Note1"
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        -432,
-        1600
-      ],
-      "typeVersion": 1,
-      "id": "274e2ccc-1db0-4ca4-815a-e9b1fdffca22",
-      "name": "Sticky Note2"
+      "id": "9926b190-4ff6-45e4-89a5-0e76c47ee64a",
+      "name": "data extraction loop"
     },
     {
       "parameters": {
-        "content": "## User chat to interact with the system.\n\n#### - The system mainly for attaching files and requiring a task.\n#### - The user can attach files including pdf, txt, docx, csv, xls, and xlsx.\n#### - If the user asked something without attaching a file, the Chat agent will instruct the user the best way.\n\n## Tasks the system can preform:\n#### - Summarisation\n#### - Classification\n#### - Data Extraction\n ",
-        "height": 1152,
-        "width": 2288,
-        "color": 7
+        "jsCode": "const items = $input.all();\n\nconst cleanKey = (key) => key.replace(/_/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());\n\nconst formatSection = (obj) =>\n  Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** ${v}`)\n    .join('\\n');\n\nconst formatFinancials = (obj) => {\n  return Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** &nbsp;&nbsp; ${v}`)\n    .join('\\n');\n};\n\nconst formatLineItems = (lineItems, currency = '') => {\n  const c = currency || '';\n  return lineItems.map((item, i) => {\n    const desc = item.description || 'Item';\n    const code = item.product_code ? ` *(${item.product_code})*` : '';\n    const qty = item.quantity || '-';\n    const price = item.unit_price ? `${c}${item.unit_price}` : '-';\n    const total = item.line_total ? `${c}${item.line_total}` : '-';\n    return `**${i + 1}. ${desc}**${code}\\n- Qty: ${qty} \u00d7 ${price} = **${total}**`;\n  }).join('\\n\\n');\n};\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    const d = data.extracted_data || {};\n\n    let output = `# ${data.filename}\\n###### Type: ${data.document_type}\\n\\n`;\n\n    if (d.parties && Object.values(d.parties).some(v => v))\n      output += `**Parties:**\\n${formatSection(d.parties)}\\n\\n`;\n\n    if (d.dates && Object.values(d.dates).some(v => v))\n      output += `**Dates:**\\n${formatSection(d.dates)}\\n\\n`;\n\n    if (d.reference_numbers && Object.values(d.reference_numbers).some(v => v))\n      output += `**Reference Numbers:**\\n${formatSection(d.reference_numbers)}\\n\\n`;\n\n    const currency = d.financials \n  ? (Object.entries(d.financials).find(([k]) => k === 'currency')?.[1] || '')\n  : '';\n\n  if (d.financials && Object.values(d.financials).some(v => v))\n  output += `**Financials:**\\n${formatFinancials(d.financials)}\\n\\n`;\n\n  if (d.line_items && d.line_items.length)\n  output += `**Line Items:**\\n\\n${formatLineItems(d.line_items, currency)}\\n\\n`;\n\n    if (d.payment_details && Object.values(d.payment_details).some(v => v))\n      output += `**Payment Details:**\\n${formatSection(d.payment_details)}\\n\\n`;\n\n    if (data.notes)\n      output += `**Notes:** ${data.notes}`;\n\n    return output;\n\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
       },
-      "type": "n8n-nodes-base.stickyNote",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        -1936,
-        -608
+        2896,
+        1280
       ],
-      "typeVersion": 1,
-      "id": "59d513f8-ba3a-40da-93d2-132f9b39c971",
-      "name": "Sticky Note3"
+      "id": "75a3e61a-d8e7-41f6-8145-454a92855845",
+      "name": "Code in JavaScript1"
     },
     {
       "parameters": {
-        "content": "## Summariser Agent\n\n#### This is a specialised agent in summarisation, summarise each file independently, or splitting the large files into smaller chunks\n#### with overlaps making the summarisation more accurate.\n\n#### The agent summarise the files in points to give the user a good overview for each file.",
-        "height": 1152,
-        "width": 1632,
-        "color": 4
+        "promptType": "define",
+        "text": "=You are a data extraction agent.\nYour job is to extract key structured information from documents such as bills, invoices, receipts, contracts, and financial documents.\n\n## Document\nFilename: {{ $json.filename }}\nContent: {{ $json.content }}\n\n## Output\nReturn this JSON only, no other text:\n\n{\n  \"filename\": \"{{ $json.filename }}\",\n  \"document_type\": \"<Invoice | Bill | Reciept | Unknown>\",\n  \"extracted_data\": {\n    \"dates\": {},\n    \"reference_numbers\": {},\n    \"parties\": {},\n    \"financials\": {},\n    \"line_items\": [],\n    \"payment_details\": {}\n  },\n  \"notes\": \"<anything unusual, missing, or unsupported>\"\n}\n\n\n## Rules\n- If document is a dataset or unsupported type, return document_type as Otherwise and explain in notes\n- Extract ONLY what is explicitly present, never fabricate\n- Missing fields should be null\n- Preserve original values exactly as they appear",
+        "options": {}
       },
-      "type": "n8n-nodes-base.stickyNote",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
       "position": [
-        368,
-        -608
+        2304,
+        1552
       ],
-      "typeVersion": 1,
-      "id": "dbd1e796-acac-4c0d-b372-c7cc42b72332",
-      "name": "Sticky Note4"
+      "id": "53982e06-e3c6-4369-8fc0-380449c5f11a",
+      "name": "AI Agent2"
     },
     {
       "parameters": {
-        "content": "## Orchestrator Agent\n\n#### The orchestrator analyse the user message and decides which specialised agent to call.\n\n#### There are 3 specialised agents:\n##### - Summariser\n##### - Classifier\n##### - Data Extractor\n\n##### Otherwise, the orchestrator rejects the user's request and instruct the user about the existing tasks.",
-        "height": 1632,
-        "width": 1632,
-        "color": 3
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
       },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        368,
-        560
-      ],
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
-      "id": "d21fef9d-da8a-4877-8387-08dcec15b19b",
-      "name": "Sticky Note6"
+      "position": [
+        2304,
+        1776
+      ],
+      "id": "75286067-069d-4ef2-ace0-13f8bafa2cfd",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2",
+          "name": "Google Gemini"
+        }
+      }
     },
     {
       "parameters": {
-        "content": "## Data Extractor Agent\n\n#### The data extraction agent, extracts from each file the key information, including:\n##### - Key parties (e.g. names, companies, shipping company)\n##### - Key numbers (e.g account number, order number)\n##### - Key dates (e.g. issue date, due date)\n##### - Main addresses (e.g. shipping address, return address, home address)\n##### - Billing breakdown (e.g. total amount, tax, unit price)\n##### - Item information (eg. item name, quantity, price)\n##### - Payment (e.g. amount paid, payment method)",
-        "height": 1632,
-        "width": 1680,
-        "color": 6
+        "contextWindowLength": 50
       },
-      "type": "n8n-nodes-base.stickyNote",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
       "position": [
-        2016,
-        560
+        2448,
+        1824
       ],
-      "typeVersion": 1,
-      "id": "b596fb45-3936-4ab8-9424-f49fbb8262c7",
-      "name": "Sticky Note5"
-    },
-    {
-      "parameters": {
-        "content": "## Classifier Agent\n\n#### The agent classifies each file independently, giving an output of:\n##### - File name\n##### - File type\n##### - File category\n##### - One line of an overview of the file",
-        "height": 1152,
-        "width": 1680,
-        "color": 5
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        2016,
-        -608
-      ],
-      "typeVersion": 1,
-      "id": "f2d9ad78-f138-4a85-b619-cee5b15d0839",
-      "name": "Sticky Note8"
+      "id": "22f6e04a-31fd-40ab-b053-08a5d01a6e4e",
+      "name": "Postgres Chat Memory3",
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres (RAG DB)"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -1933,6 +1919,90 @@
           }
         ]
       ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data extraction helper": {
+      "main": [
+        [
+          {
+            "node": "data extraction loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data extraction loop": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Chat4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory3": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "data extraction loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -1943,11 +2013,14 @@
     "timeSavedMode": "fixed",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "56282283-4db6-4816-932f-196db98bde98",
+  "staticData": null,
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "0100da079a35f46ba7261a088e6c8fad90d707a68ebdf9df5f9f23e780399700"
+    "templateCredsSetupCompleted": true
   },
-  "id": "7tPyu-w8qpUo3oeb-eGdx",
-  "tags": []
+  "pinData": {},
+  "versionId": "8f18b181-3c6c-4918-abb6-b3bec66aa16e",
+  "activeVersionId": null,
+  "versionCounter": 784,
+  "triggerCount": 1,
+  "id": "7tPyu-w8qpUo3oeb-eGdx"
 }
