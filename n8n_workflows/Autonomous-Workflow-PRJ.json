@@ -1,8 +1,5 @@
 {
   "name": "Autonomous-Workflow-PRJ",
-  "description": null,
-  "active": false,
-  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -20,7 +17,7 @@
     {
       "parameters": {
         "public": true,
-        "initialMessages": "Hi there! \ud83d\udc4b\nMy name is Alan Turing.\nI can assist you in files related task like:\n- Summarisation\n- Data Extraction \n- Classification",
+        "initialMessages": "Hi there! 👋\nMy name is Alan Turing.\nI can assist you in files related task like:\n- Summarisation\n- Data Extraction \n- Classification",
         "options": {
           "allowFileUploads": true,
           "responseMode": "responseNodes"
@@ -712,7 +709,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=You are a summarisation agent.\nYour job is to summarise the document content provided to you.\n\n## Input Fields\nYou will receive:\n- filename: {{ $json.filename }}\n- content (the text to summarise): {{ $json.content }}\n- mode: tells you what part of the document this is ({{ $json.mode }})\n- chunk_index: which part this is ({{ $json.chunk_index }})\n- total_chunks: how many parts total ({{ $json.total_chunks }})\n\n## Rules Based on Mode\n\nIf {{ $json.mode }} = \"direct\":\n- You have the COMPLETE document\n- Provide a full final summary\n- Short doc  => one paragraph\n- Medium doc => 3-5 bullet points\n- Long doc   => overview + key points + conclusion\n\nIf {{ $json.mode }} = \"partial\":\n- You have chunk {{ $json.chunk_index }} of {{ $json.total_chunks }}\n- Summarize ONLY what is in this chunk\n- Do NOT conclude, more parts follow\n- End with: \"[Part {{ $json.chunk_index }} of {{ $json.total_chunks }} summarised]\"\n\nIf {{ $json.mode }} = \"final\":\n- You have the LAST chunk of {{ $json.total_chunks }} parts\n- Summarise this chunk\n- Then write a final conclusion for the whole document\n- End with: \"[End of document]\"\n\n## Rules\n- Never fabricate content not present in the document\n- Never refer to \"chunk\" or \"part\" in your summary output \u2014 write naturally\n- Always start your response with the filename: \"## {{ $json.filename }}\"\n- If content appears incomplete or cut off, note it briefly ",
+        "text": "=You are a summarisation agent.\nYour job is to summarise the document content provided to you.\n\n## Input Fields\nYou will receive:\n- filename: {{ $json.filename }}\n- content (the text to summarise): {{ $json.content }}\n- mode: tells you what part of the document this is ({{ $json.mode }})\n- chunk_index: which part this is ({{ $json.chunk_index }})\n- total_chunks: how many parts total ({{ $json.total_chunks }})\n\n## Rules Based on Mode\n\nIf {{ $json.mode }} = \"direct\":\n- You have the COMPLETE document\n- Provide a full final summary\n- Short doc  => one paragraph\n- Medium doc => 3-5 bullet points\n- Long doc   => overview + key points + conclusion\n\nIf {{ $json.mode }} = \"partial\":\n- You have chunk {{ $json.chunk_index }} of {{ $json.total_chunks }}\n- Summarize ONLY what is in this chunk\n- Do NOT conclude, more parts follow\n- End with: \"[Part {{ $json.chunk_index }} of {{ $json.total_chunks }} summarised]\"\n\nIf {{ $json.mode }} = \"final\":\n- You have the LAST chunk of {{ $json.total_chunks }} parts\n- Summarise this chunk\n- Then write a final conclusion for the whole document\n- End with: \"[End of document]\"\n\n## Rules\n- Never fabricate content not present in the document\n- Never refer to \"chunk\" or \"part\" in your summary output — write naturally\n- Always start your response with the filename: \"## {{ $json.filename }}\"\n- If content appears incomplete or cut off, note it briefly ",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -1010,7 +1007,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nconst cleanKey = (key) => key.replace(/_/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());\n\nconst formatSection = (obj) =>\n  Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** ${v}`)\n    .join('\\n');\n\nconst formatFinancials = (obj) => {\n  return Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** &nbsp;&nbsp; ${v}`)\n    .join('\\n');\n};\n\nconst formatLineItems = (lineItems, currency = '') => {\n  const c = currency || '';\n  return lineItems.map((item, i) => {\n    const desc = item.description || 'Item';\n    const code = item.product_code ? ` *(${item.product_code})*` : '';\n    const qty = item.quantity || '-';\n    const price = item.unit_price ? `${c}${item.unit_price}` : '-';\n    const total = item.line_total ? `${c}${item.line_total}` : '-';\n    return `**${i + 1}. ${desc}**${code}\\n- Qty: ${qty} \u00d7 ${price} = **${total}**`;\n  }).join('\\n\\n');\n};\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    const d = data.extracted_data || {};\n\n    let output = `## ${data.filename}\\n###### Type: ${data.document_type}\\n\\n`;\n\n    if (d.parties && Object.values(d.parties).some(v => v))\n      output += `**Parties:**\\n${formatSection(d.parties)}\\n\\n`;\n\n    if (d.dates && Object.values(d.dates).some(v => v))\n      output += `**Dates:**\\n${formatSection(d.dates)}\\n\\n`;\n\n    if (d.reference_numbers && Object.values(d.reference_numbers).some(v => v))\n      output += `**Reference Numbers:**\\n${formatSection(d.reference_numbers)}\\n\\n`;\n\n    const currency = d.financials \n  ? (Object.entries(d.financials).find(([k]) => k === 'currency')?.[1] || '')\n  : '';\n\n  if (d.financials && Object.values(d.financials).some(v => v))\n  output += `**Financials:**\\n${formatFinancials(d.financials)}\\n\\n`;\n\n  if (d.line_items && d.line_items.length)\n  output += `**Line Items:**\\n\\n${formatLineItems(d.line_items, currency)}\\n\\n`;\n\n    if (d.payment_details && Object.values(d.payment_details).some(v => v))\n      output += `**Payment Details:**\\n${formatSection(d.payment_details)}\\n\\n`;\n\n    if (data.notes)\n      output += `**Notes:** ${data.notes}`;\n\n    return output;\n\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
+        "jsCode": "const items = $input.all();\n\nconst cleanKey = (key) => key.replace(/_/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());\n\nconst formatSection = (obj) =>\n  Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** ${v}`)\n    .join('\\n');\n\nconst formatFinancials = (obj) => {\n  return Object.entries(obj)\n    .filter(([_, v]) => v !== null && v !== undefined)\n    .map(([k, v]) => `- **${cleanKey(k)}:** &nbsp;&nbsp; ${v}`)\n    .join('\\n');\n};\n\nconst formatLineItems = (lineItems, currency = '') => {\n  const c = currency || '';\n  return lineItems.map((item, i) => {\n    const desc = item.description || 'Item';\n    const code = item.product_code ? ` *(${item.product_code})*` : '';\n    const qty = item.quantity || '-';\n    const price = item.unit_price ? `${c}${item.unit_price}` : '-';\n    const total = item.line_total ? `${c}${item.line_total}` : '-';\n    return `**${i + 1}. ${desc}**${code}\\n- Qty: ${qty} × ${price} = **${total}**`;\n  }).join('\\n\\n');\n};\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    const d = data.extracted_data || {};\n\n    let output = `## ${data.filename}\\n###### Type: ${data.document_type}\\n\\n`;\n\n    if (d.parties && Object.values(d.parties).some(v => v))\n      output += `**Parties:**\\n${formatSection(d.parties)}\\n\\n`;\n\n    if (d.dates && Object.values(d.dates).some(v => v))\n      output += `**Dates:**\\n${formatSection(d.dates)}\\n\\n`;\n\n    if (d.reference_numbers && Object.values(d.reference_numbers).some(v => v))\n      output += `**Reference Numbers:**\\n${formatSection(d.reference_numbers)}\\n\\n`;\n\n    const currency = d.financials \n  ? (Object.entries(d.financials).find(([k]) => k === 'currency')?.[1] || '')\n  : '';\n\n  if (d.financials && Object.values(d.financials).some(v => v))\n  output += `**Financials:**\\n${formatFinancials(d.financials)}\\n\\n`;\n\n  if (d.line_items && d.line_items.length)\n  output += `**Line Items:**\\n\\n${formatLineItems(d.line_items, currency)}\\n\\n`;\n\n    if (d.payment_details && Object.values(d.payment_details).some(v => v))\n      output += `**Payment Details:**\\n${formatSection(d.payment_details)}\\n\\n`;\n\n    if (data.notes)\n      output += `**Notes:** ${data.notes}`;\n\n    return output;\n\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1262,6 +1259,7 @@
       "name": "Sticky Note8"
     }
   ],
+  "pinData": {},
   "connections": {
     "Document_Tool": {
       "main": [
@@ -1937,6 +1935,7 @@
       ]
     }
   },
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
@@ -1944,14 +1943,11 @@
     "timeSavedMode": "fixed",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "staticData": null,
-  "meta": {
-    "templateCredsSetupCompleted": true
-  },
-  "pinData": {},
   "versionId": "56282283-4db6-4816-932f-196db98bde98",
-  "activeVersionId": null,
-  "versionCounter": 1472,
-  "triggerCount": 1,
-  "id": "7tPyu-w8qpUo3oeb-eGdx"
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0100da079a35f46ba7261a088e6c8fad90d707a68ebdf9df5f9f23e780399700"
+  },
+  "id": "7tPyu-w8qpUo3oeb-eGdx",
+  "tags": []
 }
