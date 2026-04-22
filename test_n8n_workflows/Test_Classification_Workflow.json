@@ -1,0 +1,474 @@
+{
+  "name": "Test_Classification_Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        528
+      ],
+      "id": "afb01304-5188-4ea1-8e4a-a5cd72de3e0a",
+      "name": "classification helper"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        656,
+        320
+      ],
+      "id": "19ae56cb-462c-4330-9a64-f4e405bf5b4a",
+      "name": "classification loop"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be56ba83-444f-42ef-bdd0-9bd0a02191e2",
+              "name": "output.text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        976,
+        304
+      ],
+      "id": "537a004f-7bf2-40dc-b932-5b2cf9e341c1",
+      "name": "classifier edit field"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst parsed = items.map(item => {\n  const text = item.json.output?.text || item.json.text || item.json.output || '';\n\n  try {\n    const cleaned = text.replace(/```json|```/g, '').trim();\n    const data = JSON.parse(cleaned);\n    return `## ${data.filename} \\n ###### **Type:** ${data.document_type} \\n ###### **Category:** ${data.category} \\n ###### **Info:** ${data.info}`;\n  } catch (e) {\n    return text;\n  }\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: parsed } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        304
+      ],
+      "id": "0ba7a39c-e6d2-461a-a29b-c20e3a2df05a",
+      "name": "classifier parser"
+    },
+    {
+      "parameters": {
+        "content": "## Classifier Agent\n\n#### The agent classifies each file independently, giving an output of:\n##### - File name\n##### - File type\n##### - File category\n##### - One line of an overview of the file",
+        "height": 1152,
+        "width": 1680,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "0c4305b2-1f0d-486a-8e56-35bb39244edf",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Orchestrator Agent\n\n#### The orchestrator analyse the user message and decides which specialised agent to call.\n\n#### There are 3 specialised agents:\n##### - Summariser\n##### - Classifier\n##### - Data Extractor\n\n##### Otherwise, the orchestrator rejects the user's request and instruct the user about the existing tasks.",
+        "height": 1152,
+        "width": 1632,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1648,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "c0856569-65c0-4a9d-8926-1187c49a38b5",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Summarisation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "716a24b3-a548-4e25-a519-286c8014b891"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0468230c-afb1-46fc-841a-2a6c61a417bb",
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Clasification",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7766d057-ace0-4851-b256-c4cc4ce4eac5",
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Data Extraction",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c7c4b30f-f49e-4b5d-90d3-16aa12a8bf2e",
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Otherwise",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        608
+      ],
+      "id": "19efb323-fabf-46b5-a3e3-72b975186dfe",
+      "name": "Switch Task"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        832
+      ],
+      "id": "7a38c8fc-f287-4a59-b463-5809cd02ba08",
+      "name": "Orchestrator-LLM",
+      "credentials": {
+        "groqApi": {
+          "id": "3",
+          "name": "Groq"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User message: \"Categorize the following files into 3 groups.\"\n\nAnylayse the user message and decide what task from the following is required.\n- Summarisation \n- Clasification\n- Data Extraction\n- Otherwise\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1024,
+        640
+      ],
+      "id": "18885204-e947-4001-964a-3d9195af4f17",
+      "name": "Orchestrator",
+      "executeOnce": true,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Task\": \"XXXX\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -848,
+        832
+      ],
+      "id": "0098c8ce-7993-43b5-80b9-0dd744942949",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1520,
+        640
+      ],
+      "id": "dfa496d4-b95d-45f6-9367-8550ef14e668",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        416
+      ],
+      "id": "8dd584ce-db50-4340-b4a8-28e78cce0c6b",
+      "name": "Summarisation Node"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        688
+      ],
+      "id": "ed9253e0-271c-4997-bee7-04e16e17aabe",
+      "name": "Data-Extraction Node"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        848
+      ],
+      "id": "54637b00-c5fc-4665-b71e-266a1cec6276",
+      "name": "Task Refusal"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        304
+      ],
+      "id": "7df9b01f-f5b6-4ede-a088-75f1f9796afb",
+      "name": "Success Execution"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        832,
+        496
+      ],
+      "id": "fe956042-d68e-47e5-950f-ad6bfd3b062d",
+      "name": "Classification Agent"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "classification helper": {
+      "main": [
+        [
+          {
+            "node": "classification loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classification loop": {
+      "main": [
+        [
+          {
+            "node": "classifier edit field",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classification Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classifier edit field": {
+      "main": [
+        [
+          {
+            "node": "classifier parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classifier parser": {
+      "main": [
+        [
+          {
+            "node": "Success Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Task": {
+      "main": [
+        [
+          {
+            "node": "Summarisation Node",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "classification helper",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Data-Extraction Node",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Task Refusal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrator-LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Orchestrator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrator": {
+      "main": [
+        [
+          {
+            "node": "Switch Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Orchestrator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Orchestrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classification Agent": {
+      "main": [
+        [
+          {
+            "node": "classification loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "807bf16c-0891-4fd0-9ed9-46a50c06e836",
+  "meta": {
+    "instanceId": "0100da079a35f46ba7261a088e6c8fad90d707a68ebdf9df5f9f23e780399700"
+  },
+  "id": "Rje6iRZQ0V4xjaA_jKGEL",
+  "tags": []
+}

@@ -1,0 +1,479 @@
+{
+  "name": "Test_Summarisation_Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Orchestrator Agent\n\n#### The orchestrator analyse the user message and decides which specialised agent to call.\n\n#### There are 3 specialised agents:\n##### - Summariser\n##### - Classifier\n##### - Data Extractor\n\n##### Otherwise, the orchestrator rejects the user's request and instruct the user about the existing tasks.",
+        "height": 1104,
+        "width": 1632,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        896,
+        1056
+      ],
+      "typeVersion": 1,
+      "id": "46ed2134-44b0-4aca-804c-5786f19ac464",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Summariser Agent\n\n#### This is a specialised agent in summarisation, summarise each file independently, or splitting the large files into smaller chunks\n#### with overlaps making the summarisation more accurate.\n\n#### The agent summarise the files in points to give the user a good overview for each file.",
+        "height": 1104,
+        "width": 1632,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2544,
+        1056
+      ],
+      "typeVersion": 1,
+      "id": "7af702de-14b0-487e-9b5d-e2135d662fde",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const summaries = items.map((item, index) => {\n  const text = item.json.output?.text || item.json.text || item.json.output;\n  return `${text}`;\n}).join('\\n\\n---\\n\\n');\n\nreturn [{ json: { message: summaries } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        1360
+      ],
+      "id": "87785b6a-9888-428c-bb4f-132c1003b459",
+      "name": "summeriser parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be56ba83-444f-42ef-bdd0-9bd0a02191e2",
+              "name": "output.text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3328,
+        1360
+      ],
+      "id": "327c1ac7-62b4-471d-80c1-e9cbed2a2d63",
+      "name": "summeriser edit field"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3024,
+        1376
+      ],
+      "id": "714db961-bcb0-4eb7-bf79-3b9ea9860271",
+      "name": "summariser loop"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2752,
+        1632
+      ],
+      "id": "a49e4b9b-60b7-4f02-b607-c3e3f2a8d4e0",
+      "name": "summariser helper"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Summarisation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "716a24b3-a548-4e25-a519-286c8014b891"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0468230c-afb1-46fc-841a-2a6c61a417bb",
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Clasification",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7766d057-ace0-4851-b256-c4cc4ce4eac5",
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Data Extraction",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c7c4b30f-f49e-4b5d-90d3-16aa12a8bf2e",
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Otherwise",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1888,
+        1664
+      ],
+      "id": "817ccc2d-193b-49f7-8c85-200fe32aed72",
+      "name": "Switch Task"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        1888
+      ],
+      "id": "f6651fde-43f2-493c-b1ef-7a6d6f59a0ee",
+      "name": "Orchestrator-LLM",
+      "credentials": {
+        "groqApi": {
+          "id": "3",
+          "name": "Groq"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User message: \"Summarise This File\"\n\nAnylayse the user message and decide what task from the following is required.\n- Summarisation \n- Clasification\n- Data Extraction\n- Otherwise\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1520,
+        1696
+      ],
+      "id": "dee36757-8263-4989-bb00-c3fdce0302c4",
+      "name": "Orchestrator",
+      "executeOnce": true,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Task\": \"XXXX\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1696,
+        1888
+      ],
+      "id": "4625b846-9045-4f49-9710-8733bfca87ae",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        1696
+      ],
+      "id": "6d82d99c-f11e-47aa-96d5-e4ca1c739519",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        1808
+      ],
+      "id": "0a185b3d-cd5d-429c-ac48-7188257623bd",
+      "name": "Data Extraction Node"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        1584
+      ],
+      "id": "1a960b2c-464f-4389-bc25-54050f498e67",
+      "name": "Classification Node"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3840,
+        1360
+      ],
+      "id": "94c126f9-fb4f-415a-a62d-c17591bef07f",
+      "name": "Success Execution"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3040,
+        1600
+      ],
+      "id": "902daf79-67b3-4eb6-b671-cab497c7b90c",
+      "name": "Summariser Agent"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        2000
+      ],
+      "id": "d78bcde2-921a-490c-9286-6c8b9c5a1ac4",
+      "name": "Task Refusal "
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "summeriser parser": {
+      "main": [
+        [
+          {
+            "node": "Success Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summeriser edit field": {
+      "main": [
+        [
+          {
+            "node": "summeriser parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summariser loop": {
+      "main": [
+        [
+          {
+            "node": "summeriser edit field",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Summariser Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summariser helper": {
+      "main": [
+        [
+          {
+            "node": "summariser loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Task": {
+      "main": [
+        [
+          {
+            "node": "summariser helper",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classification Node",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Data Extraction Node",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Task Refusal ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrator-LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Orchestrator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrator": {
+      "main": [
+        [
+          {
+            "node": "Switch Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Orchestrator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Orchestrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classification Node": {
+      "main": [
+        []
+      ]
+    },
+    "Summariser Agent": {
+      "main": [
+        [
+          {
+            "node": "summariser loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a39e5bbc-f859-4062-b410-782f8c1994f0",
+  "meta": {
+    "instanceId": "0100da079a35f46ba7261a088e6c8fad90d707a68ebdf9df5f9f23e780399700"
+  },
+  "id": "v32q5VbrwRhnmEFNRk14y",
+  "tags": []
+}
