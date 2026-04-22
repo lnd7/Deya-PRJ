@@ -1,0 +1,735 @@
+{
+  "name": "Test_Extract_Files_Node",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        -400
+      ],
+      "id": "a86f9d7d-b74b-4522-b202-fe2f7ae64bab",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// TEST: Document_Tool — validates $json.fileType output\n// which is what the Switch node reads\n// ============================================================\n\nconst mockBinaryData = {\n  pdf_by_mime:  { fileName: 'report',      mimeType: 'application/pdf' },\n  pdf_by_ext:   { fileName: 'report.pdf',  mimeType: 'application/octet-stream' },\n  txt_by_mime:  { fileName: 'notes',       mimeType: 'text/plain' },\n  txt_by_ext:   { fileName: 'notes.txt',   mimeType: 'application/octet-stream' },\n  docx_by_mime: { fileName: 'letter',      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },\n  docx_by_ext:  { fileName: 'letter.docx', mimeType: 'application/octet-stream' },\n  csv_by_mime:  { fileName: 'data',        mimeType: 'text/csv' },\n  csv_by_ext:   { fileName: 'data.csv',    mimeType: 'application/octet-stream' },\n  xls_by_mime:  { fileName: 'sheet',       mimeType: 'application/vnd.ms-excel' },\n  xls_by_ext:   { fileName: 'sheet.xls',   mimeType: 'application/octet-stream' },\n  xlsx_by_mime: { fileName: 'sheet',       mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },\n  xlsx_by_ext:  { fileName: 'sheet.xlsx',  mimeType: 'application/octet-stream' },\n  unsupported:  { fileName: 'image.png',   mimeType: 'image/png' },\n};\n\nconst expected = {\n  pdf_by_mime:  'pdf',   pdf_by_ext:  'pdf',\n  txt_by_mime:  'txt',   txt_by_ext:  'txt',\n  docx_by_mime: 'docx',  docx_by_ext: 'docx',\n  csv_by_mime:  'csv',   csv_by_ext:  'csv',\n  xls_by_mime:  'xls',   xls_by_ext:  'xls',\n  xlsx_by_mime: 'xlsx',  xlsx_by_ext: 'xlsx',\n  unsupported:  'unsupported'\n};\n\n// Mirrors your detection logic — CSV moved before TXT to fix mime clash\nfunction simulateDocumentTool(binaryData) {\n  const results = [];\n  for (const key of Object.keys(binaryData)) {\n    const file = binaryData[key];\n    const fileName = (file.fileName || 'unknown');\n    const fileNameLower = fileName.toLowerCase();\n    const mimeType = file.mimeType || '';\n    let fileType = null;\n\n    if      (mimeType.includes('pdf')              || fileNameLower.endsWith('.pdf'))  fileType = 'pdf';\n    else if (mimeType.includes('csv')              || fileNameLower.endsWith('.csv'))  fileType = 'csv';  // before 'text' to avoid text/csv clash\n    else if (mimeType.includes('text')             || fileNameLower.endsWith('.txt'))  fileType = 'txt';\n    else if (mimeType.includes('wordprocessingml') || fileNameLower.endsWith('.docx')) fileType = 'docx';\n    else if (mimeType.includes('vnd.ms-excel')     || fileNameLower.endsWith('.xls'))  fileType = 'xls';\n    else if (mimeType.includes('spreadsheetml')    || fileNameLower.endsWith('.xlsx')) fileType = 'xlsx';\n    else fileType = 'unsupported';\n\n    results.push({ json: { fileName, mimeType, fileType } });\n  }\n  return results;\n}\n\n// --- Run & Assert ---\nconst outputs_raw = simulateDocumentTool(mockBinaryData); // ← was missing\nconst keys = Object.keys(mockBinaryData);\nconst outputs = [];\n\noutputs_raw.forEach((output, i) => {\n  const key = keys[i];\n  const actual = output.json.fileType;\n  const exp = expected[key];\n  const pass = actual === exp;\n\n  outputs.push({\n    json: {\n      fileName: output.json.fileName,\n      mimeType: output.json.mimeType,\n      fileType: actual,          // ← exactly what {{ $json.fileType }} reads on the Switch\n      _test: { name: key, expected: exp, status: pass ? '✅ PASS' : '❌ FAIL' }\n    }\n  });\n});\n\nreturn outputs;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        -400
+      ],
+      "id": "a8fc324a-1bc9-4426-b041-15355ddbd05c",
+      "name": "Document_Tool"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ec97d354-ba40-4082-848f-51b41b98036f"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "53fd4943-1564-48c1-99a1-2d88cffe6185",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "txt",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "05a92d3e-29bf-454c-a653-b7dbd874ade9",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "docx",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4e78e7db-bebb-4290-9b9c-4e001deb0587",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "csv",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f638c72c-9a3e-4e0c-aa10-40685527e4ef",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "xls",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9398aed8-7dbe-4c39-9326-e263364f39b1",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "xlsx",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "79407d95-c4bb-4d4d-9871-c04be1a1ddec",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "unsupported",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -432,
+        -480
+      ],
+      "id": "d2380927-5b60-44cb-aa40-87e42792d8c6",
+      "name": "File Type"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst documentToolData = $('File Type').all();\nconst results = [];\n\nconst fileNameMap = {};\ndocumentToolData.forEach((doc, index) => {\n  fileNameMap[index] = doc.json.fileName || `Document_${index + 1}`;\n});\n\nitems.forEach((item, fileIndex) => {\n  let text = '';\n  let fileName = fileNameMap[fileIndex] || 'Unknown Document';\n\n  if (item.json.data && Array.isArray(item.json.data)) {\n    text = item.json.data\n      .map((page, pageIndex) => {\n        const pageText = (page.text || '').trim();\n\n        if (!pageText || pageText.length < 5) return null;\n\n        return `[Page ${pageIndex + 1}]\\n${pageText}`;\n      })\n      .filter(page => page !== null)\n      .join('\\n\\n');\n  }\n  else if (item.json.text) {\n    text = (item.json.text || '').trim();\n    fileName = item.json.fileName || fileName;\n  }\n  else if (item.json._test) {\n    text = `[Mock PDF content for test: ${item.json._test.name}]`;\n    fileName = item.json.fileName || fileName;\n  }\n\n  if (!text || text.trim().length < 10) return;\n\n  results.push({\n    json: {\n      fileName: fileName,\n      fileContent: text\n    }\n  });\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -1024
+      ],
+      "id": "db1db2d9-b402-406c-963b-97ae0517fd60",
+      "name": "pdf helper"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst fileName = $('CSV files loop').first().json.fileName || 'Unknown';\n\nreturn [{\n  json: {\n    fileName: fileName,\n    row_count: items.length,\n    fileContent: items.map(item => {\n      const row = {};\n      Object.entries(item.json)\n        .filter(([key]) => key !== 'myNewField')\n        .forEach(([key, value]) => row[key] = value);\n      return row;\n    })\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -448
+      ],
+      "id": "0d70ec38-368d-4ee7-9bfa-0aaf8e0e295e",
+      "name": "CSV helper"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst fileName = $('XLS files loop').first().json.fileName || 'Unknown';\n\nreturn [{\n  json: {\n    fileName: fileName,\n    row_count: items.length,\n    fileContent: items.map(item => {\n      const row = {};\n      Object.entries(item.json)\n        .filter(([key]) => key !== 'myNewField')\n        .forEach(([key, value]) => row[key] = value);\n      return row;\n    })\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -160
+      ],
+      "id": "20a7af71-59e3-4c8a-8b36-e825f8b552a5",
+      "name": "XLS helper"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst fileTypeData = $('File Type').all();\n\nconst fileNameMap = {};\nfileTypeData.forEach((doc, index) => {\n  fileNameMap[index] = doc.json.fileName || `Document_${index + 1}`;\n});\n\nconst fileGroups = {};\n\nitems.forEach((item, index) => {\n  const fileName = fileNameMap[index] || `Document_${index + 1}`;\n\n  if (!fileGroups[fileName]) {\n    fileGroups[fileName] = [];\n  }\n\n  const text = item.json.data || item.json.text || '';\n  if (text.trim()) {\n    fileGroups[fileName].push(text);\n  }\n});\n\n// Return one item per file\nreturn Object.entries(fileGroups).map(([fileName, contents]) => ({\n  json: {\n    fileName: fileName,\n    fileContent: contents.join('\\n')\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -816
+      ],
+      "id": "7d725a7a-d7ff-4938-8c77-42d09b85752b",
+      "name": "Text helper"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst fileName = $('XLSX files loop').first().json.fileName || 'Unknown';\n\nreturn [{\n  json: {\n    fileName: fileName,\n    row_count: items.length,\n    fileContent: items.map(item => {\n      const row = {};\n      Object.entries(item.json)\n        .filter(([key]) => key !== 'myNewField')\n        .forEach(([key, value]) => row[key] = value);\n      return row;\n    })\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        112
+      ],
+      "id": "828932d3-1313-4603-9ad5-1e2b29460ac6",
+      "name": "XLSX helper"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        16,
+        96
+      ],
+      "id": "54a8be36-0306-4c23-8ffe-bf2e849ebc4e",
+      "name": "XLSX files loop"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        16,
+        -176
+      ],
+      "id": "96319087-cecb-4824-98ef-a71cad54f993",
+      "name": "XLS files loop"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        16,
+        -464
+      ],
+      "id": "ce5672ea-cd0a-4f89-96dd-082d01ebe41b",
+      "name": "CSV files loop"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -384
+      ],
+      "id": "92fa8e2d-e753-494c-9d6c-7843ccf881f7",
+      "name": "helper"
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        912,
+        -448
+      ],
+      "id": "fc9b35be-e443-475a-9fb0-a26e1d0b745d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "content": "# This is a test node with some defined mock data in \"Document_Tool\" node.\n# Run and execute the workflow to test it.\n\n\n## Extract the files\n\n#### This workflow extract from different file types, as following:\n\n##### - PDF\n##### - TXT\n##### - DOCX\n##### - CSV\n##### - XLS\n##### - XLSX",
+        "height": 1632,
+        "width": 2576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1040,
+        -1088
+      ],
+      "typeVersion": 1,
+      "id": "0fd743f2-29bb-4fd1-a493-a48cb29e7618",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "const mammoth = require('mammoth');\n\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const binary = item.binary || {};\n  const binaryKey = Object.keys(binary)[0];\n\n\n  if (!binaryKey && item.json?._test) {\n    results.push({\n      json: {\n        fileName: item.json.fileName || 'Unknown.docx',\n        fileContent: `[Mock DOCX content for test: ${item.json._test.name}]`\n      }\n    });\n    continue;\n  }\n  \n  if (!binaryKey) continue;\n\n  const fileName = binary[binaryKey]?.fileName || 'Unknown.docx';\n  const buffer = await this.helpers.getBinaryDataBuffer(\n    items.indexOf(item), \n    binaryKey\n  );\n\n  try {\n    const result = await mammoth.extractRawText({ buffer });\n\n    results.push({\n      json: {\n        fileName: fileName,\n        fileContent: result.value\n      },\n      binary: {\n        data: binary[binaryKey]\n      }\n    });\n  } catch (err) {\n    results.push({\n      json: {\n        fileName: fileName,\n        fileContent: '',\n        error: err.message\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -640
+      ],
+      "id": "74df4246-030d-4cc9-a9b7-01f2a06a0b9f",
+      "name": "DOCX_Extractor_Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileTypeData = $('File Type').all();\nconst items = $input.all();\n\nconst fileList = items.map((item, index) => {\n  const fileName = fileTypeData[index]?.json?.fileName || item.json.fileName || 'Unknown file';\n  return `- ${fileName}`;\n}).join('\\n');\n\nreturn [{\n  json: {\n    message: `##### Unsupported Files\\n\\n The following file(s) could not be processed:\\n${fileList}\\n\\n ###### Supported formats: PDF, TXT, CSV, XLS, XLSX, DOCX.\\n\\n----`\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        368
+      ],
+      "id": "0ba8913d-54b8-4f94-8e2c-ce4b9eb03b20",
+      "name": "Unsupported_files_helper"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        432,
+        368
+      ],
+      "id": "f0046df1-4808-484e-a613-2d6705f9a7dc",
+      "name": "Pass: Unsupported Files"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        208,
+        112
+      ],
+      "id": "d2a4db55-6365-46d9-8fde-ab0bd0477a09",
+      "name": "Extract node XLSX"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -160
+      ],
+      "id": "d9bd9165-3397-484d-8774-f0ce7ca2a3f3",
+      "name": "Extract node XLS"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -448
+      ],
+      "id": "8a598c57-4037-4ed5-8d00-00646ccc34f1",
+      "name": "Extract node CSV"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        32,
+        -816
+      ],
+      "id": "1227bc39-6e5f-408e-a2ac-5ea09f747d99",
+      "name": "Extract node TXT"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        32,
+        -1024
+      ],
+      "id": "d54acc1c-5605-4b39-ab05-43cce1e28072",
+      "name": "Extract node PDF"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Document_Tool": {
+      "main": [
+        [
+          {
+            "node": "File Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Type": {
+      "main": [
+        [
+          {
+            "node": "Extract node PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract node TXT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DOCX_Extractor_Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CSV files loop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "XLS files loop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "XLSX files loop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported_files_helper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pdf helper": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSV helper": {
+      "main": [
+        [
+          {
+            "node": "CSV files loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XLS helper": {
+      "main": [
+        [
+          {
+            "node": "XLS files loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text helper": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "XLSX helper": {
+      "main": [
+        [
+          {
+            "node": "XLSX files loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XLSX files loop": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ],
+        [
+          {
+            "node": "Extract node XLSX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XLS files loop": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ],
+        [
+          {
+            "node": "Extract node XLS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSV files loop": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ],
+        [
+          {
+            "node": "Extract node CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "helper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DOCX_Extractor_Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Unsupported_files_helper": {
+      "main": [
+        [
+          {
+            "node": "Pass: Unsupported Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Document_Tool",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract node XLSX": {
+      "main": [
+        [
+          {
+            "node": "XLSX helper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract node XLS": {
+      "main": [
+        [
+          {
+            "node": "XLS helper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract node CSV": {
+      "main": [
+        [
+          {
+            "node": "CSV helper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract node TXT": {
+      "main": [
+        [
+          {
+            "node": "Text helper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract node PDF": {
+      "main": [
+        [
+          {
+            "node": "pdf helper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "helper": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "fb66baa6-b7e8-411c-bd51-5569895f6b7b",
+  "meta": {
+    "instanceId": "0100da079a35f46ba7261a088e6c8fad90d707a68ebdf9df5f9f23e780399700"
+  },
+  "id": "mTBmJm718Q3qjLPhBdvyJ",
+  "tags": []
+}

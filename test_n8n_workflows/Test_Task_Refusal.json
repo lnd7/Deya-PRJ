@@ -1,0 +1,345 @@
+{
+  "name": "Test_Task_Refusal",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Orchestrator Agent\n\n#### The orchestrator analyse the user message and decides which specialised agent to call.\n\n#### There are 3 specialised agents:\n##### - Summariser\n##### - Classifier\n##### - Data Extractor\n\n##### Otherwise, the orchestrator rejects the user's request and instruct the user about the existing tasks.",
+        "height": 1152,
+        "width": 1632,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -464,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "f4aa8e32-f9b8-4e7a-a659-0eaeb74ebc87",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Summarisation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "716a24b3-a548-4e25-a519-286c8014b891"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0468230c-afb1-46fc-841a-2a6c61a417bb",
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Clasification",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7766d057-ace0-4851-b256-c4cc4ce4eac5",
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Data Extraction",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c7c4b30f-f49e-4b5d-90d3-16aa12a8bf2e",
+                    "leftValue": "={{ $json.output.Task }}",
+                    "rightValue": "Otherwise",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        400
+      ],
+      "id": "4529d0ce-631a-4768-9596-224b095907ef",
+      "name": "Switch Task"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        96,
+        624
+      ],
+      "id": "352e8a3d-e4be-43f9-9204-db22e4a1cf3c",
+      "name": "Orchestrator-LLM",
+      "credentials": {
+        "groqApi": {
+          "id": "3",
+          "name": "Groq"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User message: \"Comapre the two versions of the contract.\"\n\nAnylayse the user message and decide what task from the following is required.\n- Summarisation \n- Clasification\n- Data Extraction\n- Otherwise\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        160,
+        432
+      ],
+      "id": "0ca0febf-1681-4ff6-a9a2-4504a1c7d79c",
+      "name": "Orchestrator",
+      "executeOnce": true,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Task\": \"XXXX\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        624
+      ],
+      "id": "c9d8cd48-d926-4834-85b4-297abb226ead",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        432
+      ],
+      "id": "db8aef78-aab7-4edc-8e40-a9d807897853",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        800,
+        96
+      ],
+      "id": "7d4368c1-ee37-4d4f-a077-a1b7bb769067",
+      "name": "Summarisation Node"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        800,
+        432
+      ],
+      "id": "dc7bba53-9fde-4195-afe7-439d878bebe8",
+      "name": "Data-Extraction Node"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        720,
+        672
+      ],
+      "id": "84d789af-c752-4414-ac0e-644a8c7f9d82",
+      "name": "Task Refusal"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        928,
+        672
+      ],
+      "id": "5b549015-d0cb-4187-acad-312290b0d7d6",
+      "name": "Success Execution"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        800,
+        272
+      ],
+      "id": "fe4ce7fa-ab39-4088-9d3c-46ce9cf3d7b0",
+      "name": "Classification Node"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Switch Task": {
+      "main": [
+        [
+          {
+            "node": "Summarisation Node",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classification Node",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Data-Extraction Node",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Task Refusal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrator-LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Orchestrator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrator": {
+      "main": [
+        [
+          {
+            "node": "Switch Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Orchestrator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Orchestrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Task Refusal": {
+      "main": [
+        [
+          {
+            "node": "Success Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0dd150da-d9ec-49f3-9254-d65f8077e52e",
+  "meta": {
+    "instanceId": "0100da079a35f46ba7261a088e6c8fad90d707a68ebdf9df5f9f23e780399700"
+  },
+  "id": "ozZM1oIl1-2LdajmNzdAb",
+  "tags": []
+}
