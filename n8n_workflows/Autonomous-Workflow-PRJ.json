@@ -184,7 +184,7 @@
                   {
                     "id": "0468230c-afb1-46fc-841a-2a6c61a417bb",
                     "leftValue": "={{ $json.output.Task }}",
-                    "rightValue": "Clasification",
+                    "rightValue": "Classification",
                     "operator": {
                       "type": "string",
                       "operation": "equals"

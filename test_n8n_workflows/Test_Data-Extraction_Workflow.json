@@ -133,7 +133,7 @@
                   {
                     "id": "0468230c-afb1-46fc-841a-2a6c61a417bb",
                     "leftValue": "={{ $json.output.Task }}",
-                    "rightValue": "Clasification",
+                    "rightValue": "Classification",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -223,7 +223,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=User message: \"Send the account numbers from the bills.\"\n\nAnylayse the user message and decide what task from the following is required.\n- Summarisation \n- Clasification\n- Data Extraction\n- Otherwise\n",
+        "text": "=User message: \"Send the account numbers from the bills.\"\n\nAnylayse the user message and decide what task from the following is required.\n- Summarisation \n- Classification\n- Data Extraction\n- Otherwise\n",
         "hasOutputParser": true,
         "options": {}
       },
