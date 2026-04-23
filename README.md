@@ -102,7 +102,7 @@ Or
 docker compose stop
 ```
 
-To delete and wipe all data (full reset):
+## To delete and wipe all data (full reset):
 
 ```bash
 docker-compose down --volumes --remove-orphans
