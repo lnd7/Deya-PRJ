@@ -52,7 +52,6 @@ services:
       - GENERIC_TIMEZONE=${TIMEZONE:-UTC}
       - N8N_SECURE_COOKIE=false
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
-      - N8N_API_KEY=${N8N_API_KEY}
       - N8N_PUBLIC_API_ENABLED=true
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres

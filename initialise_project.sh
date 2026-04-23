@@ -40,7 +40,6 @@ generate_if_missing() {
 }
 
 generate_if_missing N8N_ENCRYPTION_KEY
-generate_if_missing N8N_API_KEY
 
 # 3. Validate required user-filled vars
 export $(grep -v '^#' .env | xargs)
