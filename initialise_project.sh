@@ -106,7 +106,7 @@ for file in ./n8n_workflows/*.json; do
       n8n import:workflow --input="/workflows/$filename" 2>/dev/null
     if [ $? -eq 0 ]; then
       ok "Imported $filename"
-      ((count+1))
+      ((count++))
     else
       warn "$filename failed or already exists"
     fi
@@ -118,7 +118,6 @@ echo ""
 echo "#####################################"
 echo "Importing tests for workflows"
 echo "#####################################"
-count=0
 for file in ./test_n8n_workflows/*.json; do
   if [ -f "$file" ]; then
     filename=$(basename "$file")
@@ -127,7 +126,7 @@ for file in ./test_n8n_workflows/*.json; do
       n8n import:workflow --input="/test_workflows/$filename" 2>/dev/null
     if [ $? -eq 0 ]; then
       ok "Imported $filename"
-      ((count+1))
+      ((count++))
     else
       warn "$filename failed or already exists"
     fi
