@@ -8,10 +8,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1328,
-        816
+        5120,
+        3696
       ],
-      "id": "4aa65a75-edd3-414a-98fe-52f2d06e70d6",
+      "id": "546d7eb5-aea4-423b-ada1-6720c0c62f50",
       "name": "Document_Tool"
     },
     {
@@ -26,10 +26,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        -1648,
-        -592
+        4800,
+        2288
       ],
-      "id": "09c09b84-406f-4b31-b6cf-0df05854e7e8",
+      "id": "51531f1d-0356-4656-a676-b357e6ba21fd",
       "name": "When chat message received",
       "webhookId": "e0e8aee1-1c1c-4184-aec4-93fab654c83d"
     },
@@ -42,10 +42,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -720,
-        256
+        5728,
+        3136
       ],
-      "id": "94b4c437-a8cc-4d6c-8fd0-f529f992b9c6",
+      "id": "5b399d63-3c26-42fa-a1d6-54287575f29c",
       "name": "PDF_Extractor"
     },
     {
@@ -76,10 +76,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -912,
-        -592
+        5536,
+        2288
       ],
-      "id": "3a5ae847-74f5-49b2-a05f-0e4855bb6307",
+      "id": "32d2e411-26eb-45ef-a43d-6819688b2737",
       "name": "files_attached?"
     },
     {
@@ -89,10 +89,10 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        1328,
-        1024
+        7776,
+        3904
       ],
-      "id": "81055778-6dd1-4a8a-98fe-ff6cb688d316",
+      "id": "3021fa1c-36b9-4043-807b-e11b7f94b102",
       "name": "Structured Output Parser"
     },
     {
@@ -102,10 +102,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1328,
-        -592
+        5120,
+        2288
       ],
-      "id": "45ad5087-6c45-45fc-8939-f1a517f7f354",
+      "id": "010588a7-594c-422d-9fb2-86dd6df461ee",
       "name": "Check Input"
     },
     {
@@ -118,10 +118,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        1152,
-        832
+        7600,
+        3712
       ],
-      "id": "2b55324a-f739-4e28-9d43-26bd127af3ad",
+      "id": "906d7d6e-6f90-49ec-ad57-1b56192bf14a",
       "name": "Orchestrator",
       "executeOnce": true,
       "alwaysOutputData": false
@@ -134,10 +134,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        1088,
-        1024
+        7536,
+        3904
       ],
-      "id": "24b2dfcd-88c3-456a-a3a6-0c1d6793a3b0",
+      "id": "9ebdc401-ebc8-4b8f-b960-e30a785c4747",
       "name": "Orchestrator-LLM",
       "credentials": {
         "groqApi": {
@@ -245,10 +245,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        1520,
-        800
+        7968,
+        3680
       ],
-      "id": "b2fe41c9-7eaa-47b5-b4c3-fd1d4cedaeaf",
+      "id": "654fc58e-fa37-402f-b372-473ebb6b59fb",
       "name": "Switch Task"
     },
     {
@@ -259,10 +259,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -720,
-        464
+        5728,
+        3344
       ],
-      "id": "a9559f77-aa62-416f-a301-d8483753abed",
+      "id": "59c8f1dd-7840-4e0e-8757-aa0397eaea97",
       "name": "Text_Extractor"
     },
     {
@@ -272,10 +272,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -512,
-        832
+        5936,
+        3712
       ],
-      "id": "c234d13d-d723-4dfe-8c24-61f148467b8c",
+      "id": "35a8e275-96f7-4aa0-a12b-e7f8795b3b13",
       "name": "CSV_Extractor"
     },
     {
@@ -286,10 +286,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -512,
-        1120
+        5936,
+        4000
       ],
-      "id": "62ce3717-abb1-454d-890c-645a19b95a89",
+      "id": "5ae7b590-f054-48c1-bbc1-ec027c17858f",
       "name": "XLS_Extractor"
     },
     {
@@ -300,10 +300,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        -544,
-        1392
+        5904,
+        4272
       ],
-      "id": "918dc43a-bec3-45e5-9f5c-d10fe5a48fbe",
+      "id": "e88535c4-0bb9-4de2-9ae1-74baddd37ee7",
       "name": "XLSX_Extractor"
     },
     {
@@ -477,10 +477,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -1152,
-        736
+        5296,
+        3616
       ],
-      "id": "1e5c2bae-4100-4d60-8843-607241453703",
+      "id": "183b2762-5777-427e-a241-85763b436b34",
       "name": "File Type"
     },
     {
@@ -490,10 +490,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -304,
-        256
+        6144,
+        3136
       ],
-      "id": "8e712851-01ba-4efa-9c7d-184f9ee597dd",
+      "id": "65de7e57-800c-4b55-b159-7538ba9330fe",
       "name": "pdf helper"
     },
     {
@@ -503,10 +503,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -304,
-        832
+        6144,
+        3712
       ],
-      "id": "11016569-9af4-4691-bbd1-91410836d731",
+      "id": "826b5b04-59ad-4b53-9c2f-40a122939f90",
       "name": "CSV helper"
     },
     {
@@ -516,10 +516,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -304,
-        1120
+        6144,
+        4000
       ],
-      "id": "e19efa86-e4e3-4f4f-bae7-ba5f24401b29",
+      "id": "74ac634c-d34d-45fb-8404-3fc9e4ab2cdc",
       "name": "XLS helper"
     },
     {
@@ -529,10 +529,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -304,
-        464
+        6144,
+        3344
       ],
-      "id": "bc3548cf-f42a-439f-a18a-6c13c282504d",
+      "id": "decd3fbd-1ae4-4894-9585-d8ec2d794827",
       "name": "Text helper"
     },
     {
@@ -542,10 +542,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -304,
-        1392
+        6144,
+        4272
       ],
-      "id": "ac720228-026c-4127-a0e7-d70df7209ce9",
+      "id": "08e8c55c-bdf1-4b47-ac05-95223f736353",
       "name": "XLSX helper"
     },
     {
@@ -555,10 +555,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -736,
-        1376
+        5712,
+        4256
       ],
-      "id": "1dd65af0-93ca-448a-842d-156119ba4a86",
+      "id": "3fc96b38-646a-4b31-aba5-8ee4dd7eac2f",
       "name": "XLSX files loop"
     },
     {
@@ -568,10 +568,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -736,
-        1104
+        5712,
+        3984
       ],
-      "id": "7e5208fe-bd39-4c35-abcd-d87d286fc990",
+      "id": "5a4a058c-3d70-4e22-8692-ee2c38040c42",
       "name": "XLS files loop"
     },
     {
@@ -581,10 +581,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -736,
-        816
+        5712,
+        3696
       ],
-      "id": "a4a44fd6-5cfd-44a3-bda2-0f35b6c3e5fc",
+      "id": "c04ea0d7-9b2f-4a87-8741-5585069e0f54",
       "name": "CSV files loop"
     },
     {
@@ -594,10 +594,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        336,
-        800
+        6784,
+        3680
       ],
-      "id": "44f8af9b-1636-42e8-81eb-11dac8e1db67",
+      "id": "f988bb15-304a-4f4c-a7fb-64d1e2d20ffd",
       "name": "helper"
     },
     {
@@ -607,10 +607,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        112,
-        736
+        6560,
+        3616
       ],
-      "id": "5049bd28-1371-4b4e-bb0c-00e7b4c637a4",
+      "id": "9367a0ec-55b9-4fc2-8352-c0a1822cf456",
       "name": "Merge"
     },
     {
@@ -620,10 +620,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        720,
-        -528
+        7168,
+        2352
       ],
-      "id": "2ad1cdfe-b365-4636-a793-c89296643b6e",
+      "id": "31801f33-1765-416a-b29b-5a439faa1683",
       "name": "summariser helper"
     },
     {
@@ -633,10 +633,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1008,
-        -656
+        7456,
+        2224
       ],
-      "id": "896a29bf-e739-4f66-9367-fa7eec946f53",
+      "id": "9c758bdd-b0a4-493b-b086-23ffe070040a",
       "name": "summariser loop"
     },
     {
@@ -647,11 +647,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1776,
-        192
+        4672,
+        3072
       ],
       "typeVersion": 1,
-      "id": "5d9796f9-7c1f-479a-aa34-6e7eab03ca87",
+      "id": "dd269baf-762c-4d9b-9141-bd6fc10eda47",
       "name": "Sticky Note"
     },
     {
@@ -661,10 +661,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2528,
-        -480
+        8976,
+        2400
       ],
-      "id": "28be7de3-a86f-4be8-bdf2-cbf7bba91f54",
+      "id": "9c6efa3b-ea37-4fc5-8e9b-5a0d1b571723",
       "name": "classification helper"
     },
     {
@@ -674,10 +674,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        2832,
-        -656
+        9280,
+        2224
       ],
-      "id": "02dd5694-4ec9-4ebf-91da-e7e17bb52ac7",
+      "id": "60f6de99-51e6-4735-930e-8be3149acbaf",
       "name": "classification loop"
     },
     {
@@ -687,10 +687,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2480,
-        848
+        8928,
+        3728
       ],
-      "id": "67265188-5f33-4819-9c2a-1609cdfa3a42",
+      "id": "36df73f8-510a-430c-8f93-d8b3ba11ec15",
       "name": "data extraction helper"
     },
     {
@@ -700,10 +700,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        2832,
-        848
+        9280,
+        3728
       ],
-      "id": "b694633a-524b-479c-8c61-e6b965d690cb",
+      "id": "dc6b557e-a4aa-43ae-9672-c89ec4df4246",
       "name": "data extraction loop"
     },
     {
@@ -715,10 +715,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        1312,
-        -448
+        7760,
+        2432
       ],
-      "id": "63840ab4-c8a9-4e49-92e8-6bec2ed0a509",
+      "id": "c3a0e501-05d1-4886-a015-54df40a71593",
       "name": "Summariser Agent",
       "retryOnFail": true,
       "waitBetweenTries": 5000,
@@ -732,10 +732,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        1152,
-        -240
+        7600,
+        2640
       ],
-      "id": "2f798e4f-9ae8-4594-8b17-459e7e8f1af2",
+      "id": "53e615fe-337a-4213-870a-9661c7834888",
       "name": "summariser-LLM",
       "credentials": {
         "googlePalmApi": {
@@ -761,10 +761,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1312,
-        -672
+        7760,
+        2208
       ],
-      "id": "f7a536b3-b22c-4d6b-995c-86f0c280197f",
+      "id": "67c0ce87-af6b-439f-badc-520ad0f97a50",
       "name": "summeriser edit field"
     },
     {
@@ -774,10 +774,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1648,
-        -672
+        8096,
+        2208
       ],
-      "id": "88efb645-c99a-4d84-adcc-3283b27f0587",
+      "id": "5962c99a-640c-4665-bbd2-d94d55e1be7d",
       "name": "summeriser parser"
     },
     {
@@ -789,24 +789,26 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2880,
-        -448
+        9328,
+        2432
       ],
-      "id": "539af3ef-4b4b-4b1a-ae3d-5cc0ee4a0988",
+      "id": "1f2c11e2-0931-4b55-8477-d75f2b686e97",
       "name": "Classifier Agent",
       "retryOnFail": true,
       "waitBetweenTries": 5000,
       "onError": "continueErrorOutput"
     },
     {
-      "parameters": {},
+      "parameters": {
+        "contextWindowLength": 1
+      },
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        1328,
-        -240
+        7776,
+        2640
       ],
-      "id": "547425bb-4c83-4941-9602-0a498519ddf2",
+      "id": "611e573b-b1fd-4002-abfe-58e06490be2b",
       "name": "summariser chat memory",
       "credentials": {
         "postgres": {
@@ -832,10 +834,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        3152,
-        -672
+        9600,
+        2208
       ],
-      "id": "b3481eae-f5da-4273-9199-6008daa2c457",
+      "id": "a045b241-6c2b-4350-8e9f-ee2ae215076b",
       "name": "classifier edit field"
     },
     {
@@ -845,23 +847,23 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3456,
-        -672
+        9904,
+        2208
       ],
-      "id": "c430c680-29a7-4ee8-91ce-ae096cfb7d8c",
+      "id": "9b8f0e61-3091-4e82-a4aa-03001a5f6c34",
       "name": "classifier parser"
     },
     {
       "parameters": {
-        "contextWindowLength": 50
+        "contextWindowLength": 1
       },
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        3120,
-        1280
+        9568,
+        4160
       ],
-      "id": "9d25933e-b689-4272-acf5-847a2872420e",
+      "id": "2f213112-eb7d-475a-9adc-7b6634a0829c",
       "name": "data extraction chat memory",
       "credentials": {
         "postgres": {
@@ -878,10 +880,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        2928,
-        1264
+        9376,
+        4144
       ],
-      "id": "6863cfec-9855-43e1-8947-ced075f7fa3a",
+      "id": "66d6816f-51aa-4504-9602-83572086ef09",
       "name": "data extraction-LLM",
       "credentials": {
         "googlePalmApi": {
@@ -899,10 +901,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        3040,
-        1088
+        9488,
+        3968
       ],
-      "id": "e334d654-297b-4dd5-9f26-db0d7ced6a36",
+      "id": "7bef7c94-cc5d-4c6f-a81c-5d94d078d782",
       "name": "Data Extractor Agent",
       "retryOnFail": true,
       "waitBetweenTries": 5000,
@@ -926,10 +928,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        3168,
-        832
+        9616,
+        3712
       ],
-      "id": "04f74262-86a4-4f2c-b46f-8ae80e90ea7e",
+      "id": "1c2a349c-724d-4fb7-b9f2-eeb263c6c17e",
       "name": "data extractor edit field"
     },
     {
@@ -939,10 +941,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3440,
-        832
+        9888,
+        3712
       ],
-      "id": "a11c4a20-e442-445f-8dda-5d162c76f212",
+      "id": "8f167d32-ac2a-4cf7-9f83-00d1eddd2cee",
       "name": "data extractor parser"
     },
     {
@@ -953,10 +955,10 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        3648,
-        832
+        10096,
+        3712
       ],
-      "id": "42bb2060-9947-46b4-be3c-76f2ee68856a",
+      "id": "4dcf4b18-52b1-40df-9211-23105fd007cf",
       "name": "data extractor output",
       "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
     },
@@ -967,10 +969,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -512,
-        640
+        5936,
+        3520
       ],
-      "id": "e6e36036-d864-41b8-8881-e9df84d2d754",
+      "id": "e84121da-48b4-41e1-95df-c64e7e1baff6",
       "name": "DOCX_Extractor_Code"
     },
     {
@@ -982,10 +984,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        -400,
-        -576
+        6048,
+        2304
       ],
-      "id": "97c72567-25a5-4f89-a11c-cf7f6fbc174a",
+      "id": "2eb7560c-9ff6-4a30-b28b-65149ba6af8c",
       "name": "Chat History Agent"
     },
     {
@@ -995,10 +997,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        -304,
-        -368
+        6144,
+        2512
       ],
-      "id": "9c768194-2fad-4a97-8ede-a59dd5fa4100",
+      "id": "38e3f588-0569-4f05-80f1-3816ecb2fb01",
       "name": "History Chat Memory",
       "credentials": {
         "postgres": {
@@ -1015,10 +1017,10 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        16,
-        -576
+        6464,
+        2304
       ],
-      "id": "e6b8c305-0bf2-4ec2-bb47-468daaa3b20a",
+      "id": "f4f87018-cb40-4b2c-a3f7-3024e890af4e",
       "name": "chat history output",
       "webhookId": "1f7650ee-78a6-4ae9-926c-fe024b4f83d8"
     },
@@ -1029,10 +1031,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -704,
-        1648
+        5744,
+        4528
       ],
-      "id": "5651cf58-672f-45c1-a1ea-6dfa373c5345",
+      "id": "eb18cfa0-7508-4d97-b925-db34eb1c1dcb",
       "name": "Unsupported_files_helper"
     },
     {
@@ -1043,10 +1045,10 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        -320,
-        1648
+        6128,
+        4528
       ],
-      "id": "ae6ef633-f594-441f-a75e-758cd3316a67",
+      "id": "b3099c8e-dbe5-4166-9f3f-b211103bb0d6",
       "name": "output for unsupported files ",
       "webhookId": "cc5d6b00-82f6-44fe-8723-91e1ad33e834"
     },
@@ -1058,10 +1060,10 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        1776,
-        1120
+        8224,
+        4000
       ],
-      "id": "0f7927a9-e774-4ad4-8211-a48f53243d49",
+      "id": "3197f9db-d964-4e40-86e8-24172a891f81",
       "name": "output for rejected tasks",
       "webhookId": "eca95a7d-00c3-4d67-8250-93fc787841b5"
     },
@@ -1074,11 +1076,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1776,
-        -976
+        4672,
+        1904
       ],
       "typeVersion": 1,
-      "id": "ad4b1564-8f1e-42b3-baa7-adf65eb3c542",
+      "id": "2fd59814-596c-48a0-ab16-6866f2e09935",
       "name": "Sticky Note3"
     },
     {
@@ -1090,11 +1092,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        528,
-        -976
+        6976,
+        1904
       ],
       "typeVersion": 1,
-      "id": "ee232dc3-c12b-4e7b-a17b-388f42f7e631",
+      "id": "8b3cd3f4-ffd4-4d18-976d-b878702330f5",
       "name": "Sticky Note4"
     },
     {
@@ -1106,11 +1108,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        528,
-        192
+        6976,
+        3072
       ],
       "typeVersion": 1,
-      "id": "6f7715a9-ae03-4843-bb6d-c08554ce6bb8",
+      "id": "52af2445-1c58-4352-91ec-2f735a274382",
       "name": "Sticky Note6"
     },
     {
@@ -1122,11 +1124,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2384,
-        192
+        8832,
+        3072
       ],
       "typeVersion": 1,
-      "id": "5107cd18-edab-43c5-9b11-7b73d7e26e9e",
+      "id": "d5340250-94cf-448c-8801-ea4d952b0338",
       "name": "Sticky Note5"
     },
     {
@@ -1138,11 +1140,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2384,
-        -976
+        8832,
+        1904
       ],
       "typeVersion": 1,
-      "id": "b6af8083-dee9-4931-a0e6-1bd68b036649",
+      "id": "26198c31-8fdd-460d-916a-d8bb24a1c37d",
       "name": "Sticky Note8"
     },
     {
@@ -1153,10 +1155,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        2832,
-        -224
+        9280,
+        2656
       ],
-      "id": "1f8aa403-5ee0-4679-9c66-ebe97432290a",
+      "id": "f443584c-03a3-4df6-b3e2-fc0bb9a3e624",
       "name": "classifier-LLM",
       "credentials": {
         "groqApi": {
@@ -1166,14 +1168,16 @@
       }
     },
     {
-      "parameters": {},
+      "parameters": {
+        "contextWindowLength": 1
+      },
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        2960,
-        -208
+        9408,
+        2672
       ],
-      "id": "8d3fd089-417f-4829-92fc-d93b8857faa0",
+      "id": "bc04b3ef-c13b-43da-b2f4-e2c38a7a453c",
       "name": "classifier chat memory",
       "credentials": {
         "postgres": {
@@ -1190,10 +1194,10 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        3648,
-        1104
+        10096,
+        3984
       ],
-      "id": "6635ada8-ce77-4351-8339-ea3117c7da8a",
+      "id": "deebed90-e8a2-497c-9a08-16a636f39751",
       "name": "Data Extraction Error",
       "webhookId": "bdc6d764-13f4-41d9-884e-a6855c46f3c4"
     },
@@ -1205,10 +1209,10 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        1920,
-        -672
+        8368,
+        2208
       ],
-      "id": "5ebff97a-b551-4b7c-b5dd-50ca020658de",
+      "id": "1278629a-d2bb-401f-aa8a-45419ec2e837",
       "name": "Summeriser Output",
       "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
     },
@@ -1220,10 +1224,10 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        1920,
-        -432
+        8368,
+        2448
       ],
-      "id": "efa2b234-062a-4996-9c9a-e283696a7ab6",
+      "id": "28ce4e92-6d48-4f88-a1b0-a596d953652a",
       "name": "Summariser Error",
       "webhookId": "aabbbf62-ac17-477d-b73c-dbcd69499f12"
     },
@@ -1234,10 +1238,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1600,
-        -352
+        8048,
+        2528
       ],
-      "id": "31b4cf99-e72e-4371-b715-674533f316ef",
+      "id": "39df5973-72c3-4420-98cb-6b57bcddf35d",
       "name": "wait summariser",
       "webhookId": "fc7ed66d-79fc-47aa-b049-1394c7313348"
     },
@@ -1248,10 +1252,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3232,
-        -352
+        9680,
+        2528
       ],
-      "id": "b2e87c8c-5fb2-43bf-93c6-271dc5405b85",
+      "id": "e5485da0-c487-4989-90e4-4e10484cb2fd",
       "name": "wait classifier",
       "webhookId": "2083cf13-ad19-418a-bc08-e1c09909d2e0"
     },
@@ -1263,10 +1267,10 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        3696,
-        -672
+        10144,
+        2208
       ],
-      "id": "958b5499-6ffb-408c-b207-70c7cfd2f3c1",
+      "id": "466fb105-c57b-4a65-bd99-2ac1567ae6b3",
       "name": "Classifier Output",
       "webhookId": "404d107c-3b4c-4c71-b93d-8fd1321af077"
     },
@@ -1278,10 +1282,10 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.1,
       "position": [
-        3696,
-        -432
+        10144,
+        2448
       ],
-      "id": "8d52be14-5875-4a1e-b13b-84212262b4b8",
+      "id": "15ad79d8-a9a4-437e-a2d7-34d5a8437cfa",
       "name": "Classifier Error",
       "webhookId": "259b1bf4-7cd8-43b5-b5fe-5a468feaeeb9"
     },
@@ -1292,10 +1296,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3408,
-        1232
+        9856,
+        4112
       ],
-      "id": "0f30c30a-eff6-42ea-8daa-204f05a72065",
+      "id": "82120b8b-4fa9-49c0-ae8e-b9079d45aa2d",
       "name": "wait data extractor",
       "webhookId": "8300a9e9-7156-45a9-bd85-7582ff86ac2f"
     },
@@ -1306,10 +1310,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -464,
-        -368
+        5984,
+        2512
       ],
-      "id": "cbfbf1ab-6864-4bd1-9d36-fdc4dc29765c",
+      "id": "8e39eb9d-ff7b-4ed8-a302-cd67f3b8934c",
       "name": "Chat history-LLM",
       "credentials": {
         "googlePalmApi": {
@@ -2038,7 +2042,7 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
@@ -2046,10 +2050,10 @@
     "timeSavedMode": "fixed",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "855ca716-38ed-48e8-ad09-9b035c468795",
+  "versionId": "a067248c-19d4-4d45-b48f-f38b0eb9c90a",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "0100da079a35f46ba7261a088e6c8fad90d707a68ebdf9df5f9f23e780399700"
+    "instanceId": "4003a32856e6f27522babe384ca2001edfe01609d3c4180e84d2bec68dbef5b3"
   },
   "id": "7tPyu-w8qpUo3oeb-eGdx",
   "tags": []
